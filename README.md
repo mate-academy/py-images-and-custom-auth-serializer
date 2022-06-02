@@ -11,7 +11,8 @@ Image field should not be available on POST `api/cinema/movies/`.
    - Image url should be shown on:
      - Movie list and detail pages
      - Movie session detail page
-2. Replace username field with email field in User model.
+2. Replace username field with email field in User model. Copy tests from
+`token-authentication` task but replace username with email where it is needed.
 3. Write custom AuthTokenSerializer, so you can obtain token with
 email and password
 
