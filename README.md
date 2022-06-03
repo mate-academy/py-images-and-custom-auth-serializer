@@ -42,8 +42,7 @@ GET http://127.0.0.1:8000/api/cinema/movie_sessions/
     }
 ]
 ```
-2. Replace username field with email field in User model. In user test, 
-replace username with email where it is needed.
+2. Replace username field with email field in User model.
 3. Write custom AuthTokenSerializer, so you can obtain token with
 email and password
 
