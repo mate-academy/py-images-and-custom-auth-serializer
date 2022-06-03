@@ -7,7 +7,7 @@
 
 1. Add ImageField `image` to the `Movie` model.
    - Upload images should be only available with `/upload-image/` endpoint.
-Image format of saving must be next:  `f"{slugify(movie.title)}-{uuid}.txt"`
+Image format of saving must be next:  `f"{slugify(movie.title)}-{uuid}.{ext}"`
 
 Image field should not be available on POST `api/cinema/movies/`.
    - Image url should be shown on:
