@@ -108,8 +108,8 @@ class MovieViewSet(
 
         return MovieSerializer
 
-    @action(methods=["POST",], detail=True, url_path="upload-image",
-            permission_classes=[IsAuthenticated,]
+    @action(methods=["POST", ], detail=True, url_path="upload-image",
+            permission_classes=[IsAuthenticated, ]
             )
     def upload_image(self, request, pk=None):
         movie = self.get_object()
@@ -128,9 +128,9 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         .select_related("movie", "cinema_hall")
         .annotate(
             tickets_available=(
-                    F("cinema_hall__rows")
-                    * F("cinema_hall__seats_in_row")
-                    - Count("tickets")
+                F("cinema_hall__rows")
+                * F("cinema_hall__seats_in_row")
+                - Count("tickets")
             )
         )
     )
