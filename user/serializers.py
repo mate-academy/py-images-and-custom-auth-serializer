@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class MyAuthTokenSerializer(serializers.Serializer):
+class AuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(
         label=_("Email"),
         write_only=True
