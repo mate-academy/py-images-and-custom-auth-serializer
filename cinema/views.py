@@ -108,8 +108,8 @@ class MovieViewSet(
 
         return MovieSerializer
 
-    @action(methods=["POST"], detail=True, url_path="upload-image",
-            permission_classes=[IsAuthenticated]
+    @action(methods=["POST",], detail=True, url_path="upload-image",
+            permission_classes=[IsAuthenticated,]
             )
     def upload_image(self, request, pk=None):
         movie = self.get_object()
