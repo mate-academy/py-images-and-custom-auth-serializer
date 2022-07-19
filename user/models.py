@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
@@ -10,15 +9,13 @@ class UserManager(BaseUserManager):
 
     use_in_migrations = True
 
-    def _create_user(self, email, password, username=None, **extra_fields):
+    def _create_user(self, email, password, **extra_fields):
         """Create and save a User with the given email and password."""
         if not email:
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
-        if username:
-            user.username = username
         user.save(using=self._db)
         return user
 
@@ -28,7 +25,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, **extra_fields)
 
-    def create_superuser(self, email, password, username, **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):
         """Create and save a SuperUser with the given email and password."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -38,26 +35,13 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(email, password, username, **extra_fields)
+        return self._create_user(email, password, **extra_fields)
 
 
 class User(AbstractUser):
+    """User model."""
 
-    username_validator = UnicodeUsernameValidator()
-
-    username = models.CharField(
-        _("username"),
-        max_length=150,
-        unique=True,
-        help_text=_(
-            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-        ),
-        validators=[username_validator],
-        error_messages={
-            "unique": _("A user with that username already exists."),
-        },
-        blank=True,
-    )
+    username = None
     email = models.EmailField(_("email address"), unique=True)
 
     USERNAME_FIELD = "email"
