@@ -60,6 +60,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "cinema_service.urls"
 
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
