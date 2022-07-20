@@ -55,7 +55,7 @@ class MovieImageUploadTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_superuser(
-            "admin@myproject.com", "password"
+            'admin@myproject.com', 'password'
         )
         self.client.force_authenticate(self.user)
         self.movie = sample_movie()
