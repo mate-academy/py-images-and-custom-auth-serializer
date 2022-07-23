@@ -26,6 +26,25 @@ def sample_movie(**params):
     return Movie.objects.create(**defaults)
 
 
+def sample_genre(**params):
+    defaults = {
+        "name": "Drama",
+    }
+    defaults.update(params)
+
+    return Genre.objects.create(**defaults)
+
+
+def sample_actor(**params):
+    defaults = {
+        "first_name": "George",
+        "last_name": "Clooney"
+    }
+    defaults.update(params)
+
+    return Actor.objects.create(**defaults)
+
+
 def sample_movie_session(**params):
     cinema_hall = CinemaHall.objects.create(name="Blue", rows=20, seats_in_row=20)
 
@@ -56,6 +75,8 @@ class MovieImageUploadTests(TestCase):
         )
         self.client.force_authenticate(self.user)
         self.movie = sample_movie()
+        self.genre = sample_genre()
+        self.actor = sample_actor()
         self.movie_session = sample_movie_session(movie=self.movie)
 
     def tearDown(self):
@@ -99,8 +120,9 @@ class MovieImageUploadTests(TestCase):
                 format="multipart",
             )
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(Movie.objects.filter(title="Title").exists(), False)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        movie = Movie.objects.get(title="Title")
+        self.assertFalse(movie.image)
 
     def test_image_url_is_shown_on_movie_detail(self):
         url = image_upload_url(self.movie.id)
