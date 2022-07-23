@@ -46,9 +46,7 @@ def sample_actor(**params):
 
 
 def sample_movie_session(**params):
-    cinema_hall = CinemaHall.objects.create(
-        name="Blue", rows=20, seats_in_row=20
-    )
+    cinema_hall = CinemaHall.objects.create(name="Blue", rows=20, seats_in_row=20)
 
     defaults = {
         "show_time": "2022-06-02 14:00:00",
@@ -70,7 +68,6 @@ def detail_url(movie_id):
 
 
 class MovieImageUploadTests(TestCase):
-
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_superuser(
@@ -118,11 +115,9 @@ class MovieImageUploadTests(TestCase):
                     "title": "Title",
                     "description": "Description",
                     "duration": 90,
-                    "genres": [1],
-                    "actors": [1],
                     "image": ntf,
                 },
-                format="multipart"
+                format="multipart",
             )
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
