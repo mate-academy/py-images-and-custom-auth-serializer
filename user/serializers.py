@@ -1,5 +1,9 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
+from django.core import exceptions
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from django.utils.translation import gettext as _
+from django.core.validators import validate_email
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,3 +26,50 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.CharField(
+        label=_("Email"),
+        write_only=True
+    )
+    password = serializers.CharField(
+        label=_("Password"),
+        style={'input_type': 'password'},
+        trim_whitespace=False,
+        write_only=True
+    )
+    token = serializers.CharField(
+        label=_("Token"),
+        read_only=True
+    )
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            # Check if user sent email
+            if validate_email(email):
+                user_request = get_object_or_404(
+                    get_user_model(),
+                    email=email,
+                )
+
+                email = user_request.username
+
+            user = authenticate(email=email, password=password)
+
+            if user:
+                if not user.is_active:
+                    msg = _('User account is disabled.')
+                    raise exceptions.ValidationError(msg)
+            else:
+                msg = _('Unable to log in with provided credentials.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Must include "email" and "password"')
+            raise exceptions.ValidationError(msg)
+
+        attrs['user'] = user
+        return attrs
