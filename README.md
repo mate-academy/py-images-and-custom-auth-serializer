@@ -1,6 +1,6 @@
 # Images and custom auth token serializer
 
-- Read [the guideline](https://github.com/mate-academy/py-task-guideline/blob/main/README.md) before start
+Read [the guideline](https://github.com/mate-academy/py-task-guideline/blob/main/README.md) before starting.
 - Download [ModHeader](https://chrome.google.com/webstore/detail/modheader/idgpnmonknjnojddfkpgkljpfnnfcklj?hl=en)
 - Use the following command to load prepared data from fixture to test and debug your code:
   `python manage.py loaddata cinema_service_db_data.json`.
@@ -50,4 +50,5 @@ GET http://127.0.0.1:8000/api/cinema/movie_sessions/
 3. Write custom AuthTokenSerializer, so you can obtain token with
 email and password
 
-     
+   
+### Note: Check your code using this [checklist](checklist.md) before pushing your solution.
