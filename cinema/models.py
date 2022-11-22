@@ -1,6 +1,10 @@
+import os.path
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -12,14 +16,14 @@ class CinemaHall(models.Model):
     def capacity(self) -> int:
         return self.rows * self.seats_in_row
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Genre(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -27,25 +31,34 @@ class Actor(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.first_name + " " + self.last_name
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}"
+
+
+def movie_image_file_path(movie, filename):
+    _, ext = os.path.splitext(filename)
+
+    filename = f"{slugify(movie.title)}-{uuid.uuid4()}{ext}"
+
+    return os.path.join("uploads/movies/", filename)
 
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
 
     class Meta:
         ordering = ["title"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -57,7 +70,7 @@ class MovieSession(models.Model):
     class Meta:
         ordering = ["-show_time"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.movie.title + " " + str(self.show_time)
 
 
@@ -67,7 +80,7 @@ class Order(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.created_at)
 
     class Meta:
@@ -101,7 +114,7 @@ class Ticket(models.Model):
                     }
                 )
 
-    def clean(self):
+    def clean(self) -> None:
         Ticket.validate_ticket(
             self.row,
             self.seat,
@@ -121,7 +134,7 @@ class Ticket(models.Model):
             force_insert, force_update, using, update_fields
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
         )
