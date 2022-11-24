@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 
 
@@ -22,3 +22,29 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=255)
+    password = serializers.CharField(max_length=128, write_only=True)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    def validate(self, attrs):
+        email = attrs.get("email", None)
+        password = attrs.get("password", None)
+
+        if email and password:
+            user = authenticate(email=email, password=password)
+
+            if user is None:
+                raise serializers.ValidationError(
+                    "A user with this email and password is not found."
+                )
+        else:
+            raise serializers.ValidationError(
+                "User must provide email and password"
+            )
+
+        attrs["user"] = user
+
+        return attrs
