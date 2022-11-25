@@ -60,7 +60,7 @@ class MovieDetailSerializer(MovieSerializer):
 
 
 class MovieImageSerializer(MovieSerializer):
-    image = serializers.ImageField(required=True)
+    image = serializers.ImageField()
 
     class Meta:
         model = Movie
