@@ -42,9 +42,6 @@ class AuthTokenSerializer(serializers.Serializer):
             user = authenticate(request=self.context.get("request"),
                                 email=email, password=password)
 
-            # To authenticate call simply returns None for is_active=False
-            # users. (Assuming the default ModelBackend authentication
-            # backend.)
             if not user:
                 msg = _("Unable to log in with provided credentials.")
                 raise serializers.ValidationError(msg, code="authorization")
