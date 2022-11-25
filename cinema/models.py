@@ -40,10 +40,10 @@ class Actor(models.Model):
 
 
 def movie_image_path(instance, filename):
-    _, extension = os.path.splitext(filename)
+    _, ext = os.path.splitext(filename)
     return os.path.join(
         "uploads/movies/",
-        f"{slugify(instance.title)}-{uuid.uuid4()}.{extension}"
+        f"{slugify(instance.title)}-{uuid.uuid4()}.{ext}"
     )
 
 
