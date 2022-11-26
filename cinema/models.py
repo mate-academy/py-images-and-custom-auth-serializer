@@ -44,6 +44,7 @@ def movie_image_file_path(instance, file_name):
     file_name = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
     return os.path.join("uploads/movies/", file_name)
 
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
