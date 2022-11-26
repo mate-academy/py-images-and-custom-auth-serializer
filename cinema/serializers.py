@@ -33,7 +33,8 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ("id",
+        fields = (
+                  "id",
                   "title",
                   "image",
                   "description",
@@ -60,7 +61,8 @@ class MovieDetailSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id",
+        fields = (
+                  "id",
                   "title",
                   "image",
                   "description",
