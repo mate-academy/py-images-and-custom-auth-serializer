@@ -39,7 +39,7 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def bus_image_file_path(movie, filename):
+def movie_image_file_path(movie, filename):
     _, extension = os.path.splitext(filename)
 
     filename = f"{slugify(movie.title)}-{uuid.uuid4()}{extension}"
