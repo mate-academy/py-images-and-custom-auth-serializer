@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 from .models import User
 
 
+@admin.register(User)
 class EmailUserAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -40,6 +41,3 @@ class EmailUserAdmin(UserAdmin):
         "groups",
         "user_permissions",
     )
-
-
-admin.site.register(User, EmailUserAdmin)
