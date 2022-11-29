@@ -8,3 +8,4 @@ venv/
 **__pycache__/
 *.pyc
 **db.sqlite3
+/media/uploads/movies/sample-movie-0a7078b8-d41b-425d-ab5c-09cd92f31e9f.jpg
