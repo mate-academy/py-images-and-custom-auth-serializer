@@ -40,11 +40,11 @@ class Actor(models.Model):
 
 
 def movie_image_file_path(movie, filename):
-    _, ext = os.path.splitext(filename)
+    _, extension = os.path.splitext(filename)
     movie_title = slugify(movie.title)
     unique_id = uuid.uuid4()
 
-    filename = f"{movie_title}-{unique_id}{ext}"
+    filename = f"{movie_title}-{unique_id}{extension}"
 
     return os.path.join("uploads/movies/", filename)
 
