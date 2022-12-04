@@ -90,7 +90,7 @@ class MovieImageUploadTests(TestCase):
         self.movie.refresh_from_db()
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        # self.assertIn("image", res.data)
+        self.assertIn("image", res.data)
         self.assertTrue(os.path.exists(self.movie.image.path))
 
     def test_upload_image_bad_request(self):
