@@ -3,7 +3,6 @@ from django.db import models
 from django.conf import settings
 import os
 import uuid
-
 from django.utils.text import slugify
 
 
