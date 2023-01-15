@@ -27,15 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(label=_("Email"))
-    password = serializers.CharField(
-        label=_("Password", ),
-        style={"input_type": "password"},
-        trim_whitespace=False
-    )
+    password = serializers.CharField()
 
-    def validate(self, attrs):
-        email = attrs.get("email")
-        password = attrs.get("password")
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
 
         if email and password:
             user = authenticate(
@@ -52,5 +48,5 @@ class AuthTokenSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 message, code="authorization")
 
-        attrs["user"] = user
-        return attrs
+        data["user"] = user
+        return data
