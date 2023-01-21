@@ -103,7 +103,7 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
-        if self.action == "upload_image":
+        if self.action == "upload-image":
             return MovieImageSerializer
 
         return MovieSerializer
@@ -159,18 +159,6 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
             return MovieSessionDetailSerializer
 
         return MovieSessionSerializer
-
-    @action(methods=["POST"], detail=True,
-            url_path="upload-image")
-    def upload_image(self, request, pk=None):
-        session = self.get_object()
-        serializer = self.get_serializer(session, data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderPagination(PageNumberPagination):
