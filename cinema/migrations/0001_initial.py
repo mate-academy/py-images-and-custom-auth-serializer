@@ -9,9 +9,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
     operations = [
         migrations.CreateModel(
@@ -80,9 +78,7 @@ class Migration(migrations.Migration):
                 ("actors", models.ManyToManyField(to="cinema.actor")),
                 ("genres", models.ManyToManyField(to="cinema.genre")),
             ],
-            options={
-                "ordering": ["title"],
-            },
+            options={"ordering": ["title"]},
         ),
         migrations.CreateModel(
             name="MovieSession",
@@ -111,9 +107,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "ordering": ["-show_time"],
-            },
+            options={"ordering": ["-show_time"]},
         ),
         migrations.CreateModel(
             name="Order",
@@ -136,9 +130,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "ordering": ["-created_at"],
-            },
+            options={"ordering": ["-created_at"]},
         ),
         migrations.CreateModel(
             name="Ticket",

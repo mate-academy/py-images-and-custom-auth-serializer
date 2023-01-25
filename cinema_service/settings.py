@@ -20,18 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
+SECRET_KEY = \
     "django-insecure-6vubhk2$++agnctay_4pxy_8cq)mosmn(*-#2b^v4cgsh-^!i3"
-)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+INTERNAL_IPS = ["127.0.0.1"]
 
 # Application definition
 
@@ -73,9 +70,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-            ],
+            ]
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = "cinema_service.wsgi.application"
@@ -87,8 +84,7 @@ WSGI_APPLICATION = "cinema_service.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+        "NAME": BASE_DIR / "db.sqlite3"}
 }
 
 
@@ -98,20 +94,14 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation."
-        "UserAttributeSimilarityValidator",
+        "UserAttributeSimilarityValidator"
     },
-    {
-        "NAME": "django.contrib.auth.password_validation."
-        "MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation."
-        "CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation."
-        "NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation."
+             "MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation."
+             "CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation."
+             "NumericPasswordValidator"},
 ]
 
 AUTH_USER_MODEL = "user.User"
@@ -125,7 +115,7 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
