@@ -1,5 +1,6 @@
 import os
 import uuid
+from typing import Any
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -39,7 +40,7 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def movie_image_file_path(instance, filename):
+def movie_image_file_path(instance: str, filename: Any):
     _, extension = os.path.splitext(filename)
 
     filename = f"{slugify(instance.title)}-{uuid.uuid4()}.{extension}"
