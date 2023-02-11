@@ -44,7 +44,9 @@ def sample_actor(**params):
 
 def sample_movie_session(**params):
     cinema_hall = CinemaHall.objects.create(
-        name="Blue", rows=20, seats_in_row=20
+        name="Blue",
+        rows=20,
+        seats_in_row=20
     )
 
     defaults = {
