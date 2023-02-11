@@ -4,7 +4,7 @@
 
 ## Code Efficiency
 
-Don"t use `serializers.CharField` while adding an image.
+Don't use `serializers.CharField` while adding an image.
 
 Good example:
 
