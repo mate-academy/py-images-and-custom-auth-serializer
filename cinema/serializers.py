@@ -1,3 +1,5 @@
+from typing import Any, Union
+
 from django.db import transaction
 from rest_framework import serializers
 
@@ -36,12 +38,13 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "title",
+            "image",
             "description",
             "duration",
-            "image",
             "genres",
             "actors",
         )
+        read_only_fields = ("id", "image", )
 
 
 class MovieListSerializer(MovieSerializer):
@@ -53,6 +56,18 @@ class MovieListSerializer(MovieSerializer):
     actors = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="full_name"
     )
+
+    class Meta:
+        model = Movie
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "image",
+            "genres",
+            "actors",
+        )
 
 
 class MovieDetailSerializer(MovieSerializer):
@@ -118,7 +133,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(
             attrs["row"],
@@ -163,7 +178,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ("id", "tickets", "created_at")
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> Order:
         with transaction.atomic():
             tickets_data = validated_data.pop("tickets")
             order = Order.objects.create(**validated_data)

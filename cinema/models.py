@@ -43,7 +43,7 @@ class Actor(models.Model):
 def movie_image_file_path(instance, filename: str) -> str:
     _, ext = os.path.splitext(filename)
 
-    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}.{ext}"
 
     return os.path.join("uploads/movies/", filename)
 
@@ -102,7 +102,7 @@ class Ticket(models.Model):
     def validate_ticket(
             row: int,
             seat: int,
-            cinema_hall: Any,
+            cinema_hall: CinemaHall,
             error_to_raise: Type[ValidationError]
     ) -> None:
         for ticket_attr_value, ticket_attr_name, cinema_hall_attr_name in [
@@ -146,5 +146,5 @@ class Ticket(models.Model):
         )
 
     class Meta:
-        unique_together = ("movie_session", "row", "seat")
+        unique_together = ("movie_session", "row", "seat",)
         ordering = ["row", "seat"]
