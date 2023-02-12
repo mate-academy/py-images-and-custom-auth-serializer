@@ -82,7 +82,7 @@ class MovieViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
-    def _params_to_ints(qs: int) -> list[int]:
+    def _params_to_ints(qs: list[str]) -> list[int]:
         """Converts a list of string IDs to a list of integers"""
         return [int(str_id) for str_id in qs.split(",")]
 
@@ -124,7 +124,7 @@ class MovieViewSet(
             url_path="upload-image",
             permission_classes=[IsAdminUser, ]
             )
-    def upload_image(self, request: Request, pk: int = None) -> Response:
+    def upload_image(self, request: Request, pk: int = None) -> None:
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
 
