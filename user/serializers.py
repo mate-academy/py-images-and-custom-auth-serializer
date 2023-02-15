@@ -22,3 +22,32 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(
+        write_only=True, style={"input_type": "password"}
+    )
+
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        if email and password:
+            try:
+                user_obj = get_user_model().objects.get(email=email)
+                if not user_obj.check_password(password):
+                    raise serializers.ValidationError(
+                        "Incorrect credentials",
+                    )
+                data["user"] = user_obj
+            except get_user_model().DoesNotExist:
+                raise serializers.ValidationError(
+                    "This email is not registered",
+                )
+        else:
+            raise serializers.ValidationError(
+                "Missing credentials",
+            )
+        return data
