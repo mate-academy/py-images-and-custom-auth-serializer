@@ -39,7 +39,7 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def create_custom_path(instance, filename):
+def create_custom_path(instance: "Movie", filename: str) -> str:
     _, extension = os.path.splitext(filename)
     return os.path.join(
         "uploads/images/",

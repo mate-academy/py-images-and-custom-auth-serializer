@@ -20,7 +20,7 @@ Read [the guideline](https://github.com/mate-academy/py-task-guideline/blob/main
 `detail` page inside `movie` -> `image`.
 
 Movie list example:
-```
+```python
 GET http://127.0.0.1:8000/api/cinema/movies/
 
 [
@@ -34,7 +34,7 @@ GET http://127.0.0.1:8000/api/cinema/movies/
 ```
 
 Movie session list example:
-```
+```python
 GET http://127.0.0.1:8000/api/cinema/movie_sessions/
 
 [
