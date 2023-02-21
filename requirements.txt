@@ -1,7 +1,20 @@
-django==4.1
-flake8==5.0.4
-flake8-quotes==3.3.1
-flake8-variables-names==0.0.5
-pep8-naming==0.13.2
-django-debug-toolbar==3.2.4
-djangorestframework==3.13.1
+Package                Version
+---------------------- --------
+asgiref                3.6.0
+Django                 4.1
+django-debug-toolbar   3.2.4
+djangorestframework    3.13.1
+flake8                 5.0.4
+flake8-quotes          3.3.1
+flake8-variables-names 0.0.5
+mccabe                 0.7.0
+pep8-naming            0.13.2
+Pillow                 9.4.0
+pip                    21.3.1
+pycodestyle            2.9.1
+pyflakes               2.5.0
+pytz                   2022.7.1
+setuptools             60.2.0
+sqlparse               0.4.3
+tzdata                 2022.7
+wheel                  0.37.1
