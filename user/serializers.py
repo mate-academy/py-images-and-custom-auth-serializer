@@ -41,7 +41,7 @@ class AuthTokenSerializer(serializers.Serializer):
         read_only=True
     )
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         email = attrs.get("email")
         password = attrs.get("password")
 
