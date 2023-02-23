@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
-from typing import ForwardRef
 
 
 class CinemaHall(models.Model):
@@ -41,7 +40,7 @@ class Actor(models.Model):
 
 
 def movie_image_file_path(
-        instance: 'ForwardRef("Movie")',
+        instance: "Movie",
         filename: str
 ) -> str:
     _, extension = os.path.splitext(filename)

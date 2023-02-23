@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins, status
@@ -111,7 +112,7 @@ class MovieViewSet(
         return MovieSerializer
 
     @action(methods=["POST"], detail=True, url_path="upload-image")
-    def upload_image(self, request: Request, pk: int = None) -> Response:
+    def upload_image(self, request: Request, pk: Optional[int] = None) -> Response:
         """The endpoint for uploading image to a specific movie"""
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
