@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import uuid
 
@@ -39,7 +41,7 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def create_custom_path(instance, filename: str) -> str:
+def create_custom_path(instance: Movie, filename: str) -> str:
     _, ext = os.path.splitext(filename)
     return os.path.join(
         "uploads/movies/",
