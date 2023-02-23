@@ -6,6 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
@@ -110,7 +111,7 @@ class MovieViewSet(
         return MovieSerializer
 
     @action(methods=["POST"], detail=True, url_path="upload-image")
-    def upload_image(self, request, pk=None):
+    def upload_image(self, request: Request, pk: int = None) -> Response:
         """The endpoint for uploading image to a specific movie"""
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
