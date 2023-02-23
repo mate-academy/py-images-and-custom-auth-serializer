@@ -1,5 +1,3 @@
-from typing import Dict, Union, Any
-
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import gettext as _
@@ -45,8 +43,8 @@ class AuthTokenSerializer(serializers.Serializer):
 
     def validate(
             self,
-            attrs: Dict[str, Union[str, Any]]
-    ) -> Dict[str, Union[str, Any]]:
+            attrs: dict
+    ) -> dict:
         email = attrs.get("email")
         password = attrs.get("password")
 
