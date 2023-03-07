@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, Optional
 
 from django.db.models import F, Count, QuerySet
 from django.http import HttpRequest
@@ -110,7 +110,11 @@ class MovieViewSet(
         url_path="upload-image",
         permission_classes=[IsAdminUser]
     )
-    def upload_image(self, request: HttpRequest, pk: int = None) -> Response:
+    def upload_image(
+            self,
+            request: HttpRequest,
+            pk: Optional[int] = None
+    ) -> Response:
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
         serializer.is_valid(raise_exception=True)
