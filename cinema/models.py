@@ -1,8 +1,13 @@
+from __future__ import annotations
+
+import os
+import uuid
 from typing import Type, Any
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -37,10 +42,19 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def movie_image_file_path(instance: Movie, filename: str) -> str:
+    _, extension = os.path.splitext(filename)
+
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+
+    return os.path.join("uploads/movies/", filename)
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
     genres = models.ManyToManyField(
         Genre,
         related_name="movies"
