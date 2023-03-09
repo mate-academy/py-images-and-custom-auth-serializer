@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, Optional
 
 from django.db.models import F, Count, QuerySet
 from rest_framework import viewsets, mixins, status
@@ -118,7 +118,7 @@ class MovieViewSet(
         url_path="upload-image",
         permission_classes=[IsAdminUser]
     )
-    def upload_image(self, request: Request, pk: int = None) -> Response:
+    def upload_image(self, request: Request, pk: Optional[int] = None) -> Response:
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
 
