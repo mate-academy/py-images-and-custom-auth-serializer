@@ -147,7 +147,7 @@ class Ticket(models.Model):
             self.row,
             self.seat,
             self.movie_session.cinema_hall,
-            ValidationError,
+            ValidationError
         )
 
     def save(
