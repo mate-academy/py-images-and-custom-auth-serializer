@@ -196,5 +196,5 @@ class OrderViewSet(
 
         return OrderSerializer
 
-    def perform_create(self, serializer) -> None:
+    def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user=self.request.user)
