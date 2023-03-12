@@ -10,7 +10,12 @@ class UserManager(BaseUserManager):
 
     use_in_migrations = True
 
-    def _create_user(self, email: str, password: str, **extra_fields) -> User:
+    def _create_user(
+            self,
+            email: str,
+            password: str,
+            **extra_fields: dict
+    ) -> User:
         """Create and save a User with the given email and password."""
         if not email:
             raise ValueError("The given email must be set")
