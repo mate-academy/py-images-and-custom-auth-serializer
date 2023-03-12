@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, Optional
 
 from django.db.models import F, Count, QuerySet
 from rest_framework import viewsets, mixins, status
@@ -105,16 +105,18 @@ class MovieViewSet(
         url_path="upload-image",
         permission_classes=[IsAdminUser],
     )
-    def upload_image(self, request: Request, pk=None) -> Response:
+    def upload_image(
+            self,
+            request: Request,
+            pk: Optional[int] = None
+    ) -> Response:
         """Endpoint for uploading image to specific movie"""
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
