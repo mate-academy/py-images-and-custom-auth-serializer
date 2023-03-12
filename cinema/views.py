@@ -25,7 +25,8 @@ from cinema.serializers import (
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
-    OrderListSerializer, MovieImageSerializer,
+    OrderListSerializer,
+    MovieImageSerializer,
 )
 
 
@@ -111,7 +112,7 @@ class MovieViewSet(
         return MovieSerializer
 
     @action(
-        methods=["GET", "POST"],
+        methods=["POST"],
         detail=True,
         url_path="upload-image",
         permission_classes=[IsAdminUser]
