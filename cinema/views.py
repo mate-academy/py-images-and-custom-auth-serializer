@@ -145,11 +145,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def get_serializer_class(self) -> Type[
-        MovieSessionListSerializer
-        | MovieSessionDetailSerializer
-        | MovieSessionSerializer
-    ]:
+    def get_serializer_class(self) -> Type[MovieSessionSerializer]:
         if self.action == "list":
             return MovieSessionListSerializer
 
@@ -179,10 +175,7 @@ class OrderViewSet(
     def get_queryset(self) -> QuerySet:
         return Order.objects.filter(user=self.request.user)
 
-    def get_serializer_class(self) -> Type[
-        OrderListSerializer
-        | OrderSerializer
-    ]:
+    def get_serializer_class(self) -> Type[OrderSerializer]:
         if self.action == "list":
             return OrderListSerializer
 
