@@ -7,6 +7,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
@@ -105,10 +106,10 @@ class MovieViewSet(
         url_path="upload-image",
         permission_classes=[IsAdminUser],
     )
-    def upload_image(self, request: HttpRequest, pk=None) -> HttpResponse:
+    def upload_image(self, request: Request, pk=None) -> Response:
         """Endpoint for uploading image to specific movie"""
         movie = self.get_object()
-        serializer = self.get_serializer(movie, data=request.POST)
+        serializer = self.get_serializer(movie, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
