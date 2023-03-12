@@ -52,7 +52,7 @@ class MovieSerializer(serializers.ModelSerializer):
         )
 
 
-class MovieListSerializer(MovieSerializer):
+class MovieListSerializer(serializers.ModelSerializer):
     genres = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="name"
     )
@@ -73,7 +73,7 @@ class MovieListSerializer(MovieSerializer):
         )
 
 
-class MovieDetailSerializer(MovieSerializer):
+class MovieDetailSerializer(serializers.ModelSerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
 
@@ -166,7 +166,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ("id", "tickets", "created_at")
 
     @transaction.atomic
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> Order:
         tickets_data = validated_data.pop("tickets")
         order = Order.objects.create(**validated_data)
         for ticket_data in tickets_data:

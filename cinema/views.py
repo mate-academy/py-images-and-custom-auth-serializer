@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Type
 
 from django.db.models import F, Count, QuerySet
-from django.http import HttpRequest, HttpResponse
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -187,5 +186,5 @@ class OrderViewSet(
 
         return OrderSerializer
 
-    def perform_create(self, serializer) -> None:
+    def perform_create(self, serializer: OrderSerializer) -> None:
         serializer.save(user=self.request.user)
