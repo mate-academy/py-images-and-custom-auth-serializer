@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Type, Any
+from typing import Type, Optional, Iterable
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -41,7 +41,7 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def movie_image_file_path(instance, filename: str) -> str:
+def movie_image_file_path(instance: "Movie", filename: str) -> str:
     _, ext = os.path.splitext(filename)
 
     filename = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
@@ -134,8 +134,8 @@ class Ticket(models.Model):
             self,
             force_insert: bool = False,
             force_update: bool = False,
-            using: Any = None,
-            update_fields: Any = None,
+            using: Optional[str] = None,
+            update_fields: Optional[Iterable[str]] = None,
     ) -> None:
         self.full_clean()
         return super(Ticket, self).save(

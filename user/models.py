@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext as _
@@ -23,7 +25,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(
-            self, email: str, password: str = None, **extra_fields
+            self, email: str, password: str = None, **extra_fields: Optional[bool | dict]
     ) -> User:
         """Create and save a regular User with the given email and password."""
 
@@ -32,7 +34,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(
-            self, email: str, password: str, **extra_fields
+            self, email: str, password: str, **extra_fields: Optional[bool | dict]
     ) -> ValueError | User:
         """Create and save a SuperUser with the given email and password."""
 

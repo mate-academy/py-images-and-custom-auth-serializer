@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type, Optional
+from typing import Type, Optional, List
 
 from django.db.models import F, Count, QuerySet
 from rest_framework import viewsets, mixins, status
@@ -74,7 +74,7 @@ class MovieViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
-    def _params_to_ints(qs: str) -> list:
+    def _params_to_ints(qs: str) -> List[int]:
         """Converts a list of string IDs to a list of integers"""
         return [int(str_id) for str_id in qs.split(",")]
 
