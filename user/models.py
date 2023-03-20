@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -22,7 +24,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(
-            self, email: str, password: str = None, **extra_fields
+            self, email: str, password: Optional[str] = None, **extra_fields
     ) -> User:
         """Create and save a regular User with the given email and password."""
         extra_fields.setdefault("is_staff", False)
@@ -36,9 +38,9 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
-        if extra_fields.get("is_staff") is not True:
+        if extra_fields.get("is_staff") is False:
             raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get("is_superuser") is not True:
+        if extra_fields.get("is_superuser") is False:
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(email, password, **extra_fields)
