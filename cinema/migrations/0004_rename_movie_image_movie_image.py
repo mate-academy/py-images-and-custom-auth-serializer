@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("cinema", "0003_rename_image_movie_movie_image")]
 
     operations = [
