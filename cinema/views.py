@@ -112,7 +112,7 @@ class MovieViewSet(
         methods=["POST"],
         detail=True,
         url_path="upload-image",
-        url_name="movie_upload_image",
+        url_name="upload-image",
         permission_classes=[IsAdminUser]
     )
     def upload_image(self, request, pk=None):
@@ -125,12 +125,12 @@ class MovieViewSet(
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
-        MovieSession.objects.all()
-            .select_related("movie", "cinema_hall")
-            .annotate(
+        MovieSession.objects.all().select_related(
+            "movie", "cinema_hall").annotate(
             tickets_available=(
-                    F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
-                    - Count("tickets")
+                F("cinema_hall__rows"
+                  ) * F("cinema_hall__seats_in_row"
+                        ) - Count("tickets")
             )
         )
     )
