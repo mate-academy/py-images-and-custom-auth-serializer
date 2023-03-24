@@ -43,7 +43,7 @@ def create_custom_path(instance: object, filename: str) -> str:
     _, ext = os.path.splitext(filename)
     filename = os.path.join(
         "uploads/images/",
-        f"{slugify(instance.title)}-{uuid.uuid4()}.{ext}"
+        f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
     )
     return filename
 
