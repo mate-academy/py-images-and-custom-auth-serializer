@@ -81,7 +81,6 @@ class MovieViewSet(
         title = self.request.query_params.get("title")
         genres = self.request.query_params.get("genres")
         actors = self.request.query_params.get("actors")
-
         queryset = self.queryset
 
         if title:
@@ -115,6 +114,7 @@ class MovieViewSet(
         serializer = super().get_serializer(movie, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
