@@ -197,7 +197,6 @@ class OrderViewSet(
 
         return queryset
 
-
     def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "list":
             return OrderListSerializer
