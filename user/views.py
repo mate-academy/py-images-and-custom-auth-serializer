@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.request import Request
 from rest_framework.settings import api_settings
 
 from user.serializers import UserSerializer, AuthTokenSerializer
@@ -21,5 +22,5 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get_object(self):
+    def get_object(self) -> Request:
         return self.request.user
