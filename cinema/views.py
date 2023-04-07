@@ -96,6 +96,9 @@ class MovieViewSet(
             actors_ids = self._params_to_ints(actors)
             queryset = queryset.filter(actors__id__in=actors_ids)
 
+        if self.action in ("list", "retrieve"):
+            queryset = queryset.prefetch_related("genres", "actors")
+
         return queryset.distinct()
 
     def get_serializer_class(self) -> Type[Serializer]:
@@ -185,7 +188,15 @@ class OrderViewSet(
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet:
-        return Order.objects.filter(user=self.request.user)
+        queryset = self.queryset.filter(user=self.request.user)
+
+        if self.action == "list":
+            queryset = queryset.prefetch_related(
+                "tickets__movie_session",
+            )
+
+        return queryset
+
 
     def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "list":
