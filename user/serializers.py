@@ -22,3 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+# class AuthTokenSerializer(serializers.Serializer):
+#     fields = ("email", "password")
