@@ -27,7 +27,12 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("image", models.ImageField(upload_to=cinema.models.create_image_path)),
+                (
+                    "image",
+                    models.ImageField(
+                        upload_to=cinema.models.create_image_path
+                    ),
+                ),
                 (
                     "movie",
                     models.ForeignKey(
