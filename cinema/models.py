@@ -35,6 +35,15 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+class Image(models.Model):
+    image = models.ImageField(upload_to="images/")
+    movie = models.ForeignKey(
+        "Movie",
+        on_delete=models.CASCADE,
+        related_name="images"
+    )
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
