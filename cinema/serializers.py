@@ -38,10 +38,22 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Image
-        fields = ("id", "image", "movie")
+        fields = ("id", "image")
+
+    def create(self, validated_data):
+        movie = self.context.get("movie")
+        image = validated_data.get("image")
+        return Image.objects.create(image=image, movie=movie)
+
+
+class ImageListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ("image",)
+
+
 
 
 class MovieListSerializer(MovieSerializer):
@@ -51,7 +63,10 @@ class MovieListSerializer(MovieSerializer):
     actors = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="full_name"
     )
-    images = ImageSerializer(many=True, read_only=True)
+    images = ImageListSerializer(
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = Movie
@@ -82,7 +97,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
         source="cinema_hall.capacity", read_only=True
     )
     tickets_available = serializers.IntegerField(read_only=True)
-    movie_images = ImageSerializer(many=True, source="movie.images")
+    movie_images = ImageListSerializer(many=True, read_only=True, source="movie.images")
 
     class Meta:
         model = MovieSession
