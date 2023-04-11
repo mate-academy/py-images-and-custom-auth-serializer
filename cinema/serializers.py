@@ -9,6 +9,7 @@ from cinema.models import (
     MovieSession,
     Ticket,
     Order,
+    Image,
 )
 
 
@@ -36,6 +37,13 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "description", "duration", "genres", "actors")
 
 
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        fields = ("image", )
+
+
 class MovieListSerializer(MovieSerializer):
     genres = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="name"
@@ -43,6 +51,11 @@ class MovieListSerializer(MovieSerializer):
     actors = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="full_name"
     )
+    images = ImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Movie
+        fields = ("id", "title", "description", "duration", "genres", "actors", "images")
 
 
 class MovieDetailSerializer(MovieSerializer):
