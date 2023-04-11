@@ -96,7 +96,6 @@ class MovieViewSet(
 
         return queryset.distinct()
 
-
     @action(
         detail=True,
         methods=["POST"],
