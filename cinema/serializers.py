@@ -98,7 +98,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
     movie_image = serializers.ImageField(
         source="movie.image",
         read_only=True,
-        allow_null=True
+        allow_null=True,
     )
     movie_title = serializers.CharField(source="movie.title", read_only=True)
     cinema_hall_name = serializers.CharField(
