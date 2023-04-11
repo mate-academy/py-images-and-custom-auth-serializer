@@ -47,6 +47,7 @@ class MovieListSerializer(MovieSerializer):
 
     class Meta(MovieSerializer.Meta):
         fields = MovieSerializer.Meta.fields + ("image",)
+        fields_read_only = ("image",)
 
 
 class MovieDetailSerializer(MovieSerializer):
