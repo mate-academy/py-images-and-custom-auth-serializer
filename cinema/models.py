@@ -41,23 +41,15 @@ class Actor(models.Model):
 
 def create_image_path(instance, filename):
     _, extension = os.path.splitext(filename)
-    filename = f"{slugify(instance.movie.title)}-{uuid.uuid4()}{extension}"
-    return os.path.join(
-        "uploads/movies/", filename
-    )
-
-
-class Image(models.Model):
-    image = models.ImageField(upload_to=create_image_path)
-    movie = models.ForeignKey(
-        "Movie",
-        on_delete=models.CASCADE,
-        related_name="images"
-    )
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    return os.path.join("uploads/movies/", filename)
 
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
+    image = models.ImageField(
+        upload_to=create_image_path, null=True, blank=True
+    )
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
