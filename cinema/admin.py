@@ -8,6 +8,7 @@ from .models import (
     MovieSession,
     Order,
     Ticket,
+    Image,
 )
 
 admin.site.register(CinemaHall)
@@ -17,3 +18,4 @@ admin.site.register(Movie)
 admin.site.register(MovieSession)
 admin.site.register(Order)
 admin.site.register(Ticket)
+admin.site.register(Image)
