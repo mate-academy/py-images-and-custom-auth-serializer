@@ -54,7 +54,6 @@ class Movie(models.Model):
     image = models.ImageField(null=True, upload_to=movie_image_file_path)
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
-    
 
     class Meta:
         ordering = ["title"]
