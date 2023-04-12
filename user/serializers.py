@@ -1,5 +1,6 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,3 +23,28 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(style={"input_type": "password"})
+
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        if email and password:
+            user = authenticate(email=email, password=password)
+
+            if user:
+                if not user.is_active:
+                    raise ValidationError("User account is disabled.")
+            else:
+                raise ValidationError(
+                    "Unable to log in with provided credentials."
+                )
+        else:
+            raise ValidationError("Must include email and password.")
+
+        data["user"] = user
+        return data
