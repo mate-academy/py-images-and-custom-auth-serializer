@@ -33,7 +33,7 @@ class AuthTokenSerializer(serializers.Serializer):
     )
     password = serializers.CharField(
         label=_("Password"),
-        style={'input_type': 'password'},
+        style={"input_type": "password"},
         trim_whitespace=False,
         write_only=True
     )
