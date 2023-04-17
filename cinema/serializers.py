@@ -38,7 +38,7 @@ class MovieSerializer(serializers.ModelSerializer):
             "title", "description",
             "duration", "genres", "actors"
         )
-        read_only_fields = ("image",)
+        # read_only_fields = ("image",)
 
 
 class MovieImageSerializer(serializers.ModelSerializer):
