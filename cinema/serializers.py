@@ -48,7 +48,10 @@ class MovieSerializer(serializers.ModelSerializer):
             "actors",
             "image",
         )
-        extra_kwargs = {"image": {"read_only": True}}
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "image": {"read_only": True}
+        }
 
 
 class MovieListSerializer(MovieSerializer):
