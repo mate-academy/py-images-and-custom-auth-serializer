@@ -20,10 +20,11 @@ from cinema.serializers import (
     MovieSessionSerializer,
     MovieSessionListSerializer,
     MovieDetailSerializer,
+    MovieImageSerializer,
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
-    OrderListSerializer, MovieImageSerializer,
+    OrderListSerializer,
 )
 
 
