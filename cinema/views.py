@@ -1,11 +1,12 @@
 from datetime import datetime
 
-from django.db.models import F, Count
+from django.db.models import F, Count, QuerySet
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
@@ -75,7 +76,7 @@ class MovieViewSet(
         """Converts a list of string IDs to a list of integers"""
         return [int(str_id) for str_id in qs.split(",")]
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         """Retrieve the movies with filters"""
         title = self.request.query_params.get("title")
         genres = self.request.query_params.get("genres")
@@ -111,10 +112,9 @@ class MovieViewSet(
     @action(
         detail=True,
         methods=["POST"],
-        url_path="upload-image",
-        permission_classes=[IsAdminUser]
+        url_path="upload-image"
     )
-    def upload_image(self, request, pk=None):
+    def upload_image(self, request: Request, pk=None) -> Response:
         movie = self.get_object()
         serializer = self.get_serializer(
             movie,
@@ -146,7 +146,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         date = self.request.query_params.get("date")
         movie_id_str = self.request.query_params.get("movie")
 
@@ -190,7 +190,7 @@ class OrderViewSet(
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         if self.action == "list":
             return self.queryset.filter(user=self.request.user)
         return self.queryset.filter(user=self.request.user)
