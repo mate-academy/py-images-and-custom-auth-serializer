@@ -36,13 +36,16 @@ class AuthTokenSerializer(serializers.Serializer):
         email = attrs.get("email")
         password = attrs.get("password")
 
-        user = authenticate(
-            request=self.context.get("request"),
-            username=email,
-            password=password
-        )
-        if not user:
-            msg = _("Unable to authenticate with provided details.")
-            raise serializers.ValidationError(msg, code="authentication")
-        attrs["user"] = user
-        return attrs
+        if email and password:
+            user = authenticate(
+                request=self.context.get("request"),
+                username=email,
+                password=password
+            )
+
+            if not user:
+                msg = _("Unable to authenticate with provided details.")
+                raise serializers.ValidationError(msg, code="authentication")
+            attrs["user"] = user
+
+            return attrs
