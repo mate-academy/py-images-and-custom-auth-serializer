@@ -40,9 +40,10 @@ class AuthTokenSerializer(serializers.Serializer):
             msg = "Unable to authenticate with provided credentials"
             raise serializers.ValidationError(msg, code="authentication")
 
-        token, _ = Token.objects.get_or_create(user=user)
+        if not user.is_active:
+            msg = "User account is not active"
+            raise serializers.ValidationError(msg, code="authentication")
 
         attrs["user"] = user
-        attrs["token"] = token
 
         return attrs
