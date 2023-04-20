@@ -1,7 +1,6 @@
-from abc import ABC
-
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
+from django.utils.translation import gettext as _
 
 from user.models import User
 
@@ -39,16 +38,16 @@ class AuthTokenSerializer(serializers.Serializer):
         email = data.get("email")
         password = data.get("password")
 
-        if email and password:
-            try:
-                user_obj = User.objects.get(email=email)
-                if not user_obj.check_password(password):
-                    raise serializers.ValidationError("Incorrect credentials")
-                data["user"] = user_obj
-            except User.DoesNotExist:
-                raise serializers.ValidationError(
-                    "This email is not registered"
-                )
-        else:
-            raise serializers.ValidationError("Missing credentials")
+        user = authenticate(
+            request=self.context.get("request"),
+            username=email,
+            password=password,
+        )
+
+        if not user:
+            error = _("Bad credentials!")
+            raise serializers.ValidationError(error, code="authorization")
+
+        data["user"] = user
+
         return data
