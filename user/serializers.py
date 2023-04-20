@@ -55,3 +55,12 @@ class AuthTokenSerializer(serializers.Serializer):
             attrs["user"] = user
 
             return attrs
+
+        else:
+
+            msg = _("Credentials invalid")
+
+            raise serializers.ValidationError(
+                msg,
+                code="authorization",
+            )
