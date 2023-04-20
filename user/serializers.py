@@ -31,11 +31,6 @@ class AuthTokenSerializer(serializers.Serializer):
         attrs["user"] = user
         return attrs
 
-    def create(self, validated_data):
-        user = validated_data["user"]
-        token, created = Token.objects.get_or_create(user=user)
-        return token
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
