@@ -56,7 +56,6 @@ class AuthTokenSerializer(serializers.Serializer):
 
             return attrs
 
-
         else:
 
             msg = _("Credentials invalid")
