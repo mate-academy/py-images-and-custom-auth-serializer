@@ -39,12 +39,21 @@ class AuthTokenSerializer(serializers.Serializer):
     def validate(self, attrs):
         email = attrs.get("email")
         password = attrs.get("password")
-        user = authenticate(request=self.context.get("request"),
-                            email=email,
-                            password=password)
-        if not user:
-            msg = _("Authentication error. Wrong credentials !")
-            raise serializers.ValidationError(msg, code="authentication")
+
+        if email and password:
+            user = authenticate(
+                request=self.context.get("request"),
+                email=email,
+                password=password,
+            )
+
+            if not user:
+                msg = _("Authentication error. Wrong credentials!")
+                raise serializers.ValidationError(msg, code="authentication")
+
+        else:
+            msg = _('Enter "username" and "password" !')
+            raise serializers.ValidationError(msg, code="authorization")
 
         attrs["user"] = user
         return attrs
