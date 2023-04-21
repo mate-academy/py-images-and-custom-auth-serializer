@@ -41,6 +41,17 @@ class AuthTokenSerializer(serializers.Serializer):
             username=email,
             password=password,
         )
+
+        if not email:
+            raise serializers.ValidationError(
+                _("Email is required."), code="email_required"
+            )
+
+        if not password:
+            raise serializers.ValidationError(
+                _("Password is required."), code="password_required"
+            )
+
         if not user:
             msg = _("Unable to authenticate with provided details.")
             raise serializers.ValidationError(msg, code="authentication")
