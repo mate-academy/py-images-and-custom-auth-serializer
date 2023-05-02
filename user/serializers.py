@@ -23,7 +23,7 @@ class AuthTokenSerializer(serializers.Serializer):
                 )
         else:
             raise serializers.ValidationError(
-                "Please provide correct credentials",
+                "Please provide email and password",
                 code="authorization"
             )
         attrs["user"] = user
