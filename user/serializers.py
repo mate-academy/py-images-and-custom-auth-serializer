@@ -55,9 +55,3 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
-
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
