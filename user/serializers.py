@@ -38,11 +38,12 @@ class AuthTokenSerializer(serializers.Serializer):
         email = data.get("email")
         password = data.get("password")
 
-        user = authenticate(
-            request=self.context.get("request"),
-            username=email,
-            password=password,
-        )
+        if email and password:
+            user = authenticate(
+                request=self.context.get("request"),
+                username=email,
+                password=password,
+            )
 
         if not user:
             error = _("Bad credentials!")
