@@ -104,7 +104,6 @@ class MovieViewSet(
         methods=["POST"],
         detail=True,
         url_path="upload-image",
-        serializer_class=MovieImageSerializer,
         permission_classes=[IsAdminUser],
     )
     def upload_image(self, request, pk=None):
