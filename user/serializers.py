@@ -41,7 +41,7 @@ class AuthTokenSerializer(serializers.Serializer):
                     "Unable to log in with provided credentials."
                 )
         else:
-            raise ValidationError("Must include 'username' and 'password'.")
+            raise ValidationError("Must include 'email' and 'password'.")
 
         attrs["user"] = user
         return attrs
