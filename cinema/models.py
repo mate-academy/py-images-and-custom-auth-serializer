@@ -42,7 +42,7 @@ class Actor(models.Model):
 def create_custom_path(instance, filename):
     _, extension = os.path.splitext(filename)
     return os.path.join(
-        "uploads/movies/",
+        "uploads/image/",
         f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
     )
 
@@ -77,7 +77,8 @@ class MovieSession(models.Model):
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
