@@ -111,7 +111,7 @@ class MovieViewSet(
 
     @action(methods=["POST"], detail=True, url_path="upload-image")
     def upload_image(self, request, pk=None):
-        """Endpoint for uploading image to specific bus"""
+        """Endpoint for uploading image to specific movie"""
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
 
