@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -49,7 +48,3 @@ class AuthTokenSerializer(serializers.Serializer):
             raise serializers.ValidationError("Missing credentials")
         return data
 
-    def save(self):
-        user = get_user_model().objects.get(email=self.validated_data["email"])
-        refresh = RefreshToken.for_user(user)
-        return {"user": user, "token": str(refresh.access_token)}
