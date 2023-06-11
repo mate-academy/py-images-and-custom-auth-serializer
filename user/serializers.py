@@ -47,4 +47,3 @@ class AuthTokenSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Missing credentials")
         return data
-
