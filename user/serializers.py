@@ -29,7 +29,8 @@ class UserSerializer(serializers.ModelSerializer):
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(
-        write_only=True, style={"input_type": "password"}
+        write_only=True,
+        style={"input_type": "password"}
     )
 
     def validate(self, data):
@@ -44,7 +45,8 @@ class AuthTokenSerializer(serializers.Serializer):
                 data["user"] = user_obj
             except User.DoesNotExist:
                 raise serializers.ValidationError(
-                    "This email is not registered")
+                    "This email is not registered"
+                )
         else:
             raise serializers.ValidationError("Missing credentials")
         return data
