@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from user.models import User
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,3 +24,29 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(
+        write_only=True,
+        style={"input_type": "password"}
+    )
+
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        if email and password:
+            try:
+                user_obj = User.objects.get(email=email)
+                if not user_obj.check_password(password):
+                    raise serializers.ValidationError("Incorrect credentials")
+                data["user"] = user_obj
+            except User.DoesNotExist:
+                raise serializers.ValidationError(
+                    "This email is not registered"
+                )
+        else:
+            raise serializers.ValidationError("Missing credentials")
+        return data
