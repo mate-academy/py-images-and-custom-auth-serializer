@@ -6,11 +6,11 @@ from django.utils.translation import gettext as _
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
+
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
         """Create and save a User with the given email and password."""
-
         if not email:
             raise ValueError("The given email must be set")
         email = self.normalize_email(email)
@@ -34,11 +34,11 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
+
         return self._create_user(email, password, **extra_fields)
 
 
 class User(AbstractUser):
-    pass
     username = None
     email = models.EmailField(_("email address"), unique=True)
 

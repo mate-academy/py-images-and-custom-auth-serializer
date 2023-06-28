@@ -12,6 +12,7 @@ mypy-extensions==1.0.0
 packaging==23.1
 pathspec==0.11.1
 pep8-naming==0.13.2
+Pillow==9.5.0
 platformdirs==3.8.0
 pycodestyle==2.9.1
 pyflakes==2.5.0
