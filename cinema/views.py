@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db.models import F, Count
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -110,7 +111,7 @@ class MovieViewSet(
 
     @action(methods=["POST"], detail=True, url_path="upload-image")
     def upload_image(self, request, pk=None):
-        movie = Movie.objects.get(pk=pk)
+        movie = get_object_or_404(Movie, pk=pk)
         serializer = self.get_serializer(movie, data=request.data)
 
         serializer.is_valid(raise_exception=True)
