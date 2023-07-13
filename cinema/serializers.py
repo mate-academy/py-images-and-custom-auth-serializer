@@ -53,7 +53,7 @@ class MovieListSerializer(MovieSerializer):
             "description",
             "duration",
             "genres",
-            "actors"
+            "actors",
         )
 
 
@@ -70,7 +70,7 @@ class MovieDetailSerializer(MovieSerializer):
             "description",
             "duration",
             "genres",
-            "actors"
+            "actors",
         )
 
 
