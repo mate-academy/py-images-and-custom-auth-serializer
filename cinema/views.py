@@ -84,10 +84,10 @@ class MovieViewSet(
 
         queryset = self.queryset
 
-        if title:
+        if title is not None:
             queryset = queryset.filter(title__icontains=title)
 
-        if genres:
+        if genres is not None:
             genres_ids = self._params_to_ints(genres)
             queryset = queryset.filter(genres__id__in=genres_ids)
 
