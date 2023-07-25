@@ -78,6 +78,11 @@ TEMPLATES = [
     },
 ]
 
+
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
+
+
 WSGI_APPLICATION = "cinema_service.wsgi.application"
 
 
@@ -119,8 +124,7 @@ AUTH_USER_MODEL = "user.User"
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_URL = "/media/"
+
 
 LANGUAGE_CODE = "en-us"
 

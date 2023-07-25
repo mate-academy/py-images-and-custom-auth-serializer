@@ -96,7 +96,7 @@ class MovieViewSet(
 
         return queryset.distinct()
 
-    @action(methods=["POST"], detail=True, url_path="upload-image", permission_classes=[IsAdminUser])
+    @action(methods=["POST"], detail=True, url_path="upload_image", permission_classes=[IsAdminUser])
     def upload_image(self, request, pk=None):
         image = self.get_object()
         serializer = self.get_serializer(image, data=request.data)
@@ -114,7 +114,7 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
-        if self.action == "upload-image":
+        if self.action == "upload_image":
             return MovieImageSerializer
 
         return MovieSerializer
