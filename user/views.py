@@ -25,7 +25,7 @@ class CreateTokenView(ObtainAuthToken):
                 coreapi.Field(
                     name="email",
                     required=True,
-                    location='form',
+                    location="form",
                     schema=coreschema.String(
                         title="Email",
                         description="Valid email for authentication",
@@ -34,7 +34,7 @@ class CreateTokenView(ObtainAuthToken):
                 coreapi.Field(
                     name="password",
                     required=True,
-                    location='form',
+                    location="form",
                     schema=coreschema.String(
                         title="Password",
                         description="Valid password for authentication",
