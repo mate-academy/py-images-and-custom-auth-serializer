@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 
+from cinema.services.movie_services import create_custom_path
+
 
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
@@ -41,6 +43,11 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(
+        upload_to=create_custom_path,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ["title"]
