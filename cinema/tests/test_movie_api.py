@@ -155,5 +155,4 @@ class MovieImageUploadTests(TestCase):
             ntf.seek(0)
             self.client.post(url, {"image": ntf}, format="multipart")
         res = self.client.get(MOVIE_SESSION_URL)
-
         self.assertIn("movie_image", res.data[0].keys())
