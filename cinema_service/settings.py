@@ -114,6 +114,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
+
 AUTH_USER_MODEL = "user.User"
 
 # Internationalization
