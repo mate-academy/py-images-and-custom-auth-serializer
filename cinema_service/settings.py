@@ -108,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "CommonPasswordValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation." 
+        "NAME": "django.contrib.auth.password_validation."
         "NumericPasswordValidator",
     },
 ]
