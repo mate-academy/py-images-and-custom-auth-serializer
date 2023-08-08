@@ -32,7 +32,7 @@ class AuthTokenSerializer(serializers.Serializer):
         email = attrs.get("email")
         password = attrs.get("password")
 
-        if email and password:
+        if email is None and password is None:
             user = authenticate(
                 request=self.context.get("request"),
                 email=email, password=password
