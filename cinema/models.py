@@ -42,8 +42,7 @@ class Actor(models.Model):
 def movie_image_file_path(instance, filename):
     _, extension = os.path.splitext(filename)
     return os.path.join(
-        "upload-image/",
-        f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+        "upload-image/", f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
     )
 
 
@@ -77,7 +76,8 @@ class MovieSession(models.Model):
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -92,7 +92,9 @@ class Ticket(models.Model):
         MovieSession, on_delete=models.CASCADE, related_name="tickets"
     )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets"
+        Order,
+        on_delete=models.CASCADE,
+        related_name="tickets"
     )
     row = models.IntegerField()
     seat = models.IntegerField()
@@ -135,9 +137,8 @@ class Ticket(models.Model):
         )
 
     def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
+        return (f"{str(self.movie_session)}"
+                f" (row: {self.row}, seat: {self.seat})")
 
     class Meta:
         unique_together = ("movie_session", "row", "seat")
