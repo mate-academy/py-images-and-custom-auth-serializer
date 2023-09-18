@@ -47,12 +47,9 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 
                     attrs["user"] = user
                     return attrs
-                else:
-                    msg = _("Invalid password.")
-                    raise serializers.ValidationError(msg)
-            else:
-                msg = _("No user with this email address.")
+                msg = _("Invalid password.")
                 raise serializers.ValidationError(msg)
-        else:
-            msg = _('Must include "email" and "password".')
+            msg = _("No user with this email address.")
             raise serializers.ValidationError(msg)
+        msg = _('Must include "email" and "password".')
+        raise serializers.ValidationError(msg)
