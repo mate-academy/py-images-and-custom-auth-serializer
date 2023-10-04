@@ -7,7 +7,7 @@ from django.db.models import F, Count
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
@@ -105,7 +105,7 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
-        if self.action == "upload_image":
+        if self.action == "uploads_image":
             return MovieImageSerializer
 
         return MovieSerializer
@@ -113,10 +113,11 @@ class MovieViewSet(
     @action(
         methods=["post"],
         detail=True,
+        permission_classes=[IsAdminUser]
     )
-    def upload_image(self, request, pk=None):
+    def uploads_image(self, request, pk=None):
         movie = self.get_object()
-        serializer: MovieImageSerializer = self.get_serializer(movie, data=request.data)
+        serializer = self.get_serializer(movie, data=request.data)
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
