@@ -10,7 +10,7 @@ from django.conf import settings
 def create_custom_path(instance, file_path):
     _, extension = os.path.splitext(file_path)
     return os.path.join(
-        "uploads/images/",
+        "uploads/movies/",
         f"{slugify(instance.title)}-{uuid4()}.{extension}"
     )
 
