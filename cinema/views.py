@@ -126,7 +126,7 @@ class MovieViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data,  status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
