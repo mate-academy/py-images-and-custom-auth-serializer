@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import gettext as _
 from user.models import User
 
+
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     """Define admin model for custom User model with no email field."""
@@ -10,8 +11,13 @@ class UserAdmin(DjangoUserAdmin):
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name")}),
-        (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser",
-                                       "groups", "user_permissions")}),
+        (_("Permissions"), {"fields": (
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "groups",
+            "user_permissions"
+        )}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
