@@ -80,7 +80,8 @@ class Migration(migrations.Migration):
                 (
                     "image",
                     models.ImageField(
-                        null=True, upload_to=cinema.models.movie_image_file_path
+                        null=True,
+                        upload_to=cinema.models.movie_image_file_path,
                     ),
                 ),
                 ("actors", models.ManyToManyField(to="cinema.actor")),
@@ -113,7 +114,8 @@ class Migration(migrations.Migration):
                 (
                     "movie",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="cinema.movie"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="cinema.movie",
                     ),
                 ),
             ],
