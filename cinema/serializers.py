@@ -108,11 +108,6 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "movie_image",
         )
 
-    def get_movie_image(self, obj):
-        if obj.movie and obj.movie.image:
-            return obj.movie.image.url
-        return None
-
 
 class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
