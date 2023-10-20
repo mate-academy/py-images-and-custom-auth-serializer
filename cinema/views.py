@@ -107,7 +107,7 @@ class MovieViewSet(
         if self.action == "upload_image":
             return MovieImageSerializer
 
-        return MovieSerializer
+        return self.serializer_class
 
     @action(
         methods=["POST"],
