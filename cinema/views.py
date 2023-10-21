@@ -108,7 +108,7 @@ class MovieViewSet(
             return MovieImageSerializer
 
         return self.serializer_class
-    
+
     @action(
         methods=["POST"],
         detail=True,
