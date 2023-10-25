@@ -23,7 +23,7 @@ Movie list example:
 ```python
 GET http://127.0.0.1:8000/api/cinema/movies/
 
-[
+[[models.py](cinema%2Fmodels.py)
     {
         "id": 1,
         ...
