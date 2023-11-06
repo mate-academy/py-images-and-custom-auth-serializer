@@ -23,7 +23,8 @@ from cinema.serializers import (
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
-    OrderListSerializer, MovieImageSerializer,
+    OrderListSerializer,
+    MovieImageSerializer,
 )
 
 
@@ -108,8 +109,12 @@ class MovieViewSet(
 
         return MovieSerializer
 
-    @action(methods=["POST"], detail=True, url_path="upload-image",
-            permission_classes=[IsAdminUser])
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminUser],
+    )
     def upload_image(self, request, pk=None):
         item = self.get_object()
         serializer = self.get_serializer(item, data=request.data)
