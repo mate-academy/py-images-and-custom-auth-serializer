@@ -70,7 +70,6 @@ class MovieViewSet(
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    # class MovieImageSerializer(serializers.ModelSerializer):
     @staticmethod
     def _params_to_ints(qs):
         """Converts a list of string IDs to a list of integers"""
@@ -81,7 +80,6 @@ class MovieViewSet(
         title = self.request.query_params.get("title")
         genres = self.request.query_params.get("genres")
         actors = self.request.query_params.get("actors")
-
         queryset = self.queryset
 
         if title:
@@ -109,7 +107,11 @@ class MovieViewSet(
 
         return MovieSerializer
 
-    @action(methods=["POST"], detail=True, url_path="upload-image", permission_classes=[IsAdminUser])
+    @action(methods=["POST"],
+            detail=True,
+            url_path="upload-image",
+            permission_classes=[IsAdminUser]
+            )
     def upload_image(self, request, pk=None):
         """ Endpoint for uploading to specific movies"""
         movie = self.get_object()
@@ -120,15 +122,16 @@ class MovieViewSet(
             return Response(serializer.data, status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
         MovieSession.objects.all()
         .select_related("movie", "cinema_hall")
         .annotate(
-            tickets_available=(
-                F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
-                - Count("tickets")
-            )
+            tickets_available=F(
+                "cinema_hall__rows") * F(
+                "cinema_hall__seats_in_row") - Count(
+                "tickets")
         )
     )
     serializer_class = MovieSessionSerializer
