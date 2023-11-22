@@ -1,7 +1,12 @@
-django==4.1
-flake8==5.0.4
+Django~=4.2.7
+djangorestframework~=3.14.0
+pip~=23.3.1
+pytz~=2023.3.post1
+asgiref~=3.7.2
+sqlparse~=0.4.4
+python-slugify~=8.0.1
+flake8~=4.0.1
+django-debug-toolbar==3.2.4
+Pillow==10.1.0
 flake8-quotes==3.3.1
 flake8-variables-names==0.0.5
-pep8-naming==0.13.2
-django-debug-toolbar==3.2.4
-djangorestframework==3.13.1
