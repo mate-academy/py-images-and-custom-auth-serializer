@@ -5,4 +5,5 @@ pytz~=2023.3.post1
 asgiref~=3.7.2
 sqlparse~=0.4.4
 python-slugify~=8.0.1
+flake8~=4.0.1
 
