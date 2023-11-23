@@ -20,9 +20,6 @@ router.register("movies", MovieViewSet)
 router.register("movie_sessions", MovieSessionViewSet)
 router.register("orders", OrderViewSet)
 
-urlpatterns = [
-                  path("", include(router.urls))
-              ] + static(settings.MEDIA_URL,
-                         document_root=settings.MEDIA_ROOT)
+urlpatterns = [path("", include(router.urls))]
 
 app_name = "cinema"
