@@ -1,6 +1,5 @@
 from os import path
 
-from django.urls import reverse
 from django.db import transaction
 from rest_framework import serializers
 
@@ -14,7 +13,6 @@ from cinema.models import (
     Order,
 )
 from cinema_service import settings
-from cinema_service.settings import INTERNAL_IPS
 
 
 class GenreSerializer(serializers.ModelSerializer):
