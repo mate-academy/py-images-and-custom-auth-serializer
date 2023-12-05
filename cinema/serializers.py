@@ -1,3 +1,6 @@
+from os import path
+
+from django.urls import reverse
 from django.db import transaction
 from rest_framework import serializers
 
@@ -10,6 +13,8 @@ from cinema.models import (
     Ticket,
     Order,
 )
+from cinema_service import settings
+from cinema_service.settings import INTERNAL_IPS
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -30,6 +35,12 @@ class CinemaHallSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "rows", "seats_in_row", "capacity")
 
 
+class MovieImgSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ("id", "image")
+
+
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
@@ -43,15 +54,36 @@ class MovieListSerializer(MovieSerializer):
     actors = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="full_name"
     )
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        url = request.build_absolute_uri('/')[:-1]
+        if obj.image:
+            return url + path.join(settings.MEDIA_URL, obj.image.name)
+        return None
+
+    class Meta:
+        model = Movie
+        fields = ("id", "title", "description", "duration", "genres", "actors", "image")
 
 
 class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
 
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        url = request.build_absolute_uri('/')[:-1]
+        if obj.image:
+            return url + path.join(settings.MEDIA_URL, obj.image.name)
+        return None
+
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = ("id", "title", "description", "duration", "genres", "actors", "image")
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -70,6 +102,15 @@ class MovieSessionListSerializer(MovieSessionSerializer):
     )
     tickets_available = serializers.IntegerField(read_only=True)
 
+    movie_image = serializers.SerializerMethodField()
+
+    def get_movie_image(self, obj):
+        request = self.context.get('request')
+        url = request.build_absolute_uri('/')[:-1]
+        if obj.movie.image:
+            return url + path.join(settings.MEDIA_URL, obj.movie.image.name)
+        return None
+
     class Meta:
         model = MovieSession
         fields = (
@@ -79,6 +120,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
+            "movie_image"
         )
 
 
