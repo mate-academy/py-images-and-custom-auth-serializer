@@ -55,15 +55,23 @@ class MovieListSerializer(MovieSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
-        request = self.context.get('request')
-        url = request.build_absolute_uri('/')[:-1]
+        request = self.context.get("request")
+        url = request.build_absolute_uri("/")[:-1]
         if obj.image:
             return url + path.join(settings.MEDIA_URL, obj.image.name)
         return None
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors", "image")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image"
+        )
 
 
 class MovieDetailSerializer(MovieSerializer):
@@ -73,15 +81,23 @@ class MovieDetailSerializer(MovieSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
-        request = self.context.get('request')
-        url = request.build_absolute_uri('/')[:-1]
+        request = self.context.get("request")
+        url = request.build_absolute_uri("/")[:-1]
         if obj.image:
             return url + path.join(settings.MEDIA_URL, obj.image.name)
         return None
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors", "image")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image"
+        )
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -103,8 +119,8 @@ class MovieSessionListSerializer(MovieSessionSerializer):
     movie_image = serializers.SerializerMethodField()
 
     def get_movie_image(self, obj):
-        request = self.context.get('request')
-        url = request.build_absolute_uri('/')[:-1]
+        request = self.context.get("request")
+        url = request.build_absolute_uri("/")[:-1]
         if obj.movie.image:
             return url + path.join(settings.MEDIA_URL, obj.movie.image.name)
         return None
