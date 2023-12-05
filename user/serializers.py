@@ -1,5 +1,26 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(email=email, password=password)
+
+            if not user:
+                raise serializers.ValidationError("Invalid login credentials")
+        else:
+            raise (serializers.
+                   ValidationError('Must include "username" and "password'))
+
+        attrs["user"] = user
+        return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
