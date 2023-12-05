@@ -1,3 +1,4 @@
+from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework import routers
 
@@ -9,6 +10,7 @@ from cinema.views import (
     MovieSessionViewSet,
     OrderViewSet,
 )
+from cinema_service import settings
 
 router = routers.DefaultRouter()
 router.register("genres", GenreViewSet)
