@@ -31,6 +31,8 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(read_only=True)
+
     class Meta:
         model = Movie
         fields = ("id",
@@ -40,7 +42,6 @@ class MovieSerializer(serializers.ModelSerializer):
                   "genres",
                   "actors",
                   "image")
-        read_only_fields = ("id", "image")
 
 
 class MovieListSerializer(MovieSerializer):
@@ -92,23 +93,21 @@ class MovieSessionListSerializer(MovieSessionSerializer):
 
     class Meta:
         model = MovieSession
-        fields = (
-            "id",
-            "show_time",
-            "movie_title",
-            "cinema_hall_name",
-            "cinema_hall_capacity",
-            "tickets_available",
-            "movie_image",
-        )
+        fields = ("id",
+                  "show_time",
+                  "movie_title",
+                  "cinema_hall_name",
+                  "cinema_hall_capacity",
+                  "tickets_available",
+                  "movie_image",)
 
 
 class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
-        Ticket.validate_ticket(
-            attrs["row"], attrs["seat"], attrs["movie_session"]
-        )
+        Ticket.validate_ticket(attrs["row"],
+                               attrs["seat"],
+                               attrs["movie_session"])
         return data
 
     class Meta:
