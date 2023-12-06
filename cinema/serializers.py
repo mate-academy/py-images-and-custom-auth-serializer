@@ -31,9 +31,17 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(read_only=True)
+
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = ("id",
+                  "title",
+                  "description",
+                  "duration",
+                  "genres",
+                  "actors",
+                  "image")
 
 
 class MovieListSerializer(MovieSerializer):
@@ -51,7 +59,19 @@ class MovieDetailSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = ("id",
+                  "title",
+                  "description",
+                  "duration",
+                  "genres",
+                  "actors",
+                  "image")
+
+
+class MovieImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ("id", "image")
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -69,6 +89,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
         source="cinema_hall.capacity", read_only=True
     )
     tickets_available = serializers.IntegerField(read_only=True)
+    movie_image = serializers.ImageField(read_only=True, source="movie.image")
 
     class Meta:
         model = MovieSession
@@ -76,6 +97,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "id",
             "show_time",
             "movie_title",
+            "movie_image",
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
@@ -85,9 +107,9 @@ class MovieSessionListSerializer(MovieSessionSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
-        Ticket.validate_ticket(
-            attrs["row"], attrs["seat"], attrs["movie_session"]
-        )
+        Ticket.validate_ticket(attrs["row"],
+                               attrs["seat"],
+                               attrs["movie_session"])
         return data
 
     class Meta:
