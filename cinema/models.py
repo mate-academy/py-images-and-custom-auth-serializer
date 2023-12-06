@@ -39,8 +39,8 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def movie_mage_file_path(instance, filename):
-    filename_without_ext, extension = os.path.splitext(filename)
+def movie_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
     unique_id = uuid.uuid4().hex
     new_filename = f"{slugify(instance.title)}-{unique_id}{extension}"
     return os.path.join("upload-image", new_filename)
@@ -52,7 +52,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
-    image = models.ImageField(null=True, upload_to=movie_mage_file_path)
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
 
     class Meta:
         ordering = ["title"]
