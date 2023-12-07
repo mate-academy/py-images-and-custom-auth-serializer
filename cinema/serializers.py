@@ -1,5 +1,4 @@
 from django.db import transaction
-from os import path
 from rest_framework import serializers
 
 from cinema.models import (
@@ -11,7 +10,6 @@ from cinema.models import (
     Ticket,
     Order,
 )
-from cinema_service import settings
 
 
 class GenreSerializer(serializers.ModelSerializer):
