@@ -39,7 +39,7 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def create_custom_path(instance, filename: str):
+def create_path_for_movie(instance, filename: str):
     _, extension = os.path.splitext(filename)
     return os.path.join(
         "uploads/movies/",
@@ -55,7 +55,7 @@ class Movie(models.Model):
     actors = models.ManyToManyField(Actor)
     image = models.ImageField(
         null=True,
-        upload_to=create_custom_path
+        upload_to=create_path_for_movie
     )
 
     class Meta:
