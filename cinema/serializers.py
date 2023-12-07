@@ -1,4 +1,5 @@
 from django.db import transaction
+from os import path
 from rest_framework import serializers
 
 from cinema.models import (
@@ -10,6 +11,7 @@ from cinema.models import (
     Ticket,
     Order,
 )
+from cinema_service import settings
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -31,7 +33,31 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(read_only=True)
+    class Meta:
+        model = Movie
+        fields = ("id",
+                  "title",
+                  "description",
+                  "duration",
+                  "genres",
+                  "actors")
+
+
+class MovieListSerializer(MovieSerializer):
+    genres = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="name"
+    )
+    actors = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="full_name"
+    )
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        request = self.context.get("request")
+        url = request.build_absolute_uri("/")[:-1]
+        if obj.image:
+            return url + path.join(settings.MEDIA_URL, obj.image.name)
+        return None
 
     class Meta:
         model = Movie
@@ -44,18 +70,18 @@ class MovieSerializer(serializers.ModelSerializer):
                   "image")
 
 
-class MovieListSerializer(MovieSerializer):
-    genres = serializers.SlugRelatedField(
-        many=True, read_only=True, slug_field="name"
-    )
-    actors = serializers.SlugRelatedField(
-        many=True, read_only=True, slug_field="full_name"
-    )
-
-
 class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
+
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        request = self.context.get("request")
+        url = request.build_absolute_uri("/")[:-1]
+        if obj.image:
+            return url + path.join(settings.MEDIA_URL, obj.image.name)
+        return None
 
     class Meta:
         model = Movie
