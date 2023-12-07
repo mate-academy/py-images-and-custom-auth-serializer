@@ -33,6 +33,7 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Movie
         fields = ("id",
@@ -44,20 +45,13 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 class MovieListSerializer(MovieSerializer):
+    image = serializers.ImageField(read_only=True)
     genres = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="name"
     )
     actors = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="full_name"
     )
-    image = serializers.SerializerMethodField()
-
-    def get_image(self, obj):
-        request = self.context.get("request")
-        url = request.build_absolute_uri("/")[:-1]
-        if obj.image:
-            return url + path.join(settings.MEDIA_URL, obj.image.name)
-        return None
 
     class Meta:
         model = Movie
@@ -73,15 +67,7 @@ class MovieListSerializer(MovieSerializer):
 class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
-
-    image = serializers.SerializerMethodField()
-
-    def get_image(self, obj):
-        request = self.context.get("request")
-        url = request.build_absolute_uri("/")[:-1]
-        if obj.image:
-            return url + path.join(settings.MEDIA_URL, obj.image.name)
-        return None
+    image = serializers.ImageField(read_only=True)
 
     class Meta:
         model = Movie
