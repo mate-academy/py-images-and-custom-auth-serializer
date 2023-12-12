@@ -1,7 +1,7 @@
 import os.path
 import uuid
-from django.utils.text import slugify
 
+from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
@@ -42,7 +42,7 @@ class Actor(models.Model):
 def movie_image_path(instance, filename):
     _, extension = os.path.splitext(filename)
 
-    filename = f"{slugify(instance.title)}-{uuid.uuid4()}.{extension}"
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
 
     return os.path.join("upload-image/", filename)
 
