@@ -42,7 +42,7 @@ class Actor(models.Model):
 def movie_image_file_path(instance: models.Model, filename: str) -> str:
     _, extension = os.path.splitext(filename)
     filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
-    return os.path.join("uploads/movie_images/", filename)
+    return os.path.join("uploads", "movie_images", filename)
 
 
 class Movie(models.Model):
