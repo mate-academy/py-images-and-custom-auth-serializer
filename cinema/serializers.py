@@ -67,7 +67,7 @@ class MovieDetailSerializer(MovieSerializer):
             "duration",
             "genres",
             "actors",
-            "image"
+            "image",
         )
         read_only_fields = ("id", "image")
 
