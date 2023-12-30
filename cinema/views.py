@@ -1,10 +1,13 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status, serializers
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
@@ -18,6 +21,7 @@ from cinema.serializers import (
     MovieSessionSerializer,
     MovieSessionListSerializer,
     MovieDetailSerializer,
+    MovieImageSerializer,
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
@@ -101,7 +105,22 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
+        if self.action == "upload_image":
+            return MovieImageSerializer
+
         return MovieSerializer
+
+    @action(methods=["POST"], detail=True)
+    def upload_image(self, request: Request, pk: int = None) -> Response:
+        movie = self.get_object()
+        serializer = self.get_serializer(movie, data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
