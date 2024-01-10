@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class CustomAuthTokenSerializers(serializers.Serializer):
+class AuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField(label=_("Email"))
     password = serializers.CharField(
         label=_("Password"), style={"input_type": "password"}
