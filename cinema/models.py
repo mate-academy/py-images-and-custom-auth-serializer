@@ -42,7 +42,7 @@ class Actor(models.Model):
 def movie_image_file_path(movie, filename) -> str:
     _, ext = os.path.splitext(filename)
 
-    filename = f"{slugify(movie.title)}-{uuid}{ext}"
+    filename = f"{slugify(movie.title)}-{uuid.uuid4()}{ext}"
 
     return os.path.join("uploads/movie/", filename)
 
@@ -56,7 +56,7 @@ class Movie(models.Model):
     image = models.ImageField(
         upload_to=movie_image_file_path,
         null=True,
-        blank=True
+        blank=True,
     )
 
     class Meta:
