@@ -28,16 +28,18 @@ class UserSerializer(serializers.ModelSerializer):
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(
-        style={"input_type": "password"}, )
+        style={"input_type": "password"},
+    )
 
     def validate(self, attrs):
         email = attrs.get("email")
         password = attrs.get("password")
 
         if email and password:
-            user = authenticate(email=email,
-                                password=password,
-                                )
+            user = authenticate(
+                email=email,
+                password=password,
+            )
             if not user:
                 raise serializers.ValidationError(
                     _("Unable to log in with provided credentials.")

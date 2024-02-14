@@ -41,10 +41,9 @@ class Actor(models.Model):
 
 def create_custom_path(instance, filename):
     _, extension = os.path.splitext(filename)
-    return os.path.join(
-        "uploads/images/",
-        f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
-    )
+    return os.path.join("uploads/images/",
+                        f"{slugify(instance.title)}-{uuid.uuid4()}{extension}",
+                        )
 
 
 class Movie(models.Model):
@@ -75,10 +74,10 @@ class MovieSession(models.Model):
 
 
 class Order(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.created_at)
@@ -89,11 +88,9 @@ class Order(models.Model):
 
 class Ticket(models.Model):
     movie_session = models.ForeignKey(
-        MovieSession, on_delete=models.CASCADE, related_name="tickets"
-    )
+        MovieSession, on_delete=models.CASCADE, related_name="tickets", )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets"
-    )
+        Order, on_delete=models.CASCADE, related_name="tickets", )
     row = models.IntegerField()
     seat = models.IntegerField()
 
@@ -108,7 +105,7 @@ class Ticket(models.Model):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                                          f"number must be in available range: "
+                                          f"number must be in range: "
                                           f"(1, {cinema_hall_attr_name}): "
                                           f"(1, {count_attrs})"
                     }
@@ -135,9 +132,8 @@ class Ticket(models.Model):
         )
 
     def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
+        return (f"{str(self.movie_session)} "
+                f"(row: {self.row}, seat: {self.seat})")
 
     class Meta:
         unique_together = ("movie_session", "row", "seat")

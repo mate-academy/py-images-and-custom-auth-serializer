@@ -22,7 +22,8 @@ from cinema.serializers import (
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
-    OrderListSerializer, MovieImageSerializer,
+    OrderListSerializer,
+    MovieImageSerializer,
 )
 
 
@@ -107,10 +108,13 @@ class MovieViewSet(
 
         return MovieSerializer
 
-    @action(methods=["POST"], detail=True, url_path="upload-image", )
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+    )
     def upload_image(self, request, pk=None):
-        serializer = self.get_serializer(self.get_object(),
-                                         data=request.data)
+        serializer = self.get_serializer(self.get_object(), data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -122,8 +126,8 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         .select_related("movie", "cinema_hall")
         .annotate(
             tickets_available=(
-                    F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
-                    - Count("tickets")
+                F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
+                - Count("tickets")
             )
         )
     )
