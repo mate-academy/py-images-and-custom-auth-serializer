@@ -51,8 +51,8 @@ class Movie(models.Model):
         _, file_extension = os.path.splitext(filename)
         unique_identifier = str(uuid4())
         movie_title_slugified = slugify(self.title)
-        final_filename = f"uploads/movies/{
-            movie_title_slugified}-{unique_identifier}{file_extension}"
+        final_filename = (f"{movie_title_slugified}-"
+                          f"{unique_identifier}{file_extension}")
         return final_filename
 
     image = models.ImageField(upload_to=generate_image_filename,
