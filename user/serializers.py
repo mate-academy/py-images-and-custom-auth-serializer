@@ -48,7 +48,5 @@ class AuthTokenSerializer(serializers.Serializer):
                 msg = _("Unable to log in with provided credentials.")
                 raise serializers.ValidationError(msg)
         else:
-            msg = _("Must include "email" and "password".")
             raise serializers.ValidationError(msg)
-
         return attrs
