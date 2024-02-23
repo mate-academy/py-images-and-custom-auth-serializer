@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -22,3 +24,31 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(label=_("Email"))
+    password = serializers.CharField(
+        label=_("Password"),
+        style={"input_type": "password"},
+        trim_whitespace=False,
+    )
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(request=self.context.get(
+                "request"), email=email, password=password)
+
+            if user:
+                attrs["user"] = user
+            else:
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg)
+        else:
+            msg = _("Must include "email" and "password".")
+            raise serializers.ValidationError(msg)
+
+        return attrs
