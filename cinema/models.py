@@ -1,10 +1,8 @@
-import os.path
-import uuid
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
-from django.utils.text import slugify
+
+from cinema.utils import movie_img_file_path
 
 
 class CinemaHall(models.Model):
@@ -37,17 +35,6 @@ class Actor(models.Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
-
-
-def movie_img_file_path(instance, filename):
-    _, ext = os.path.splitext(filename)
-
-    filename = f"{slugify(instance.title)}-{uuid.uuid4()}.{ext}"
-
-    return os.path.join(
-        "uploads/movies/",
-        filename
-    )
 
 
 class Movie(models.Model):
