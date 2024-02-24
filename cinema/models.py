@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 
+from cinema.utils import movie_img_file_path
+
 
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
@@ -39,6 +41,7 @@ class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
+    image = models.ImageField(null=True, upload_to=movie_img_file_path)
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
 
