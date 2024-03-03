@@ -42,7 +42,7 @@ class Actor(models.Model):
 def create_custom_path(instance, filename):
     _, extension = os.path.splitext(filename)
     return os.path.join(
-        "uploads/img/",
+        "uploads", "img",
         f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
     )
 
