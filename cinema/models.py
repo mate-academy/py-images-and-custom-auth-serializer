@@ -40,7 +40,7 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def create_movie_image_path(instance: "Movie", filename: str) -> str:
+def create_movie_image_path(instance: "Movie", filename: str) -> Path:
     file_basename = f"{slugify(instance.title)}-{uuid.uuid4()}"
     file_extension = Path(filename).suffix
     return Path("upload/movies") / f"{file_basename}{file_extension}"
