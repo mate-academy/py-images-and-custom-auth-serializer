@@ -90,7 +90,6 @@ class MovieImageUploadTests(TestCase):
             ntf.seek(0)
             res = self.client.post(url, {"image": ntf}, format="multipart")
         self.movie.refresh_from_db()
-
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn("image", res.data)
         self.assertTrue(os.path.exists(self.movie.image.path))
