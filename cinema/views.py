@@ -101,7 +101,6 @@ class MovieViewSet(
         methods=["POST"],
         detail=True,
         url_path="upload-image",
-        permission_classes=[IsAdminUser]
     )
     def upload_image(self, request, pk: int) -> Response:
         movie = self.get_object()
@@ -114,6 +113,7 @@ class MovieViewSet(
             )
 
     def get_serializer_class(self):
+        print("Im here", self.action)
         if self.action == "list":
             return MovieListSerializer
         if self.action == "retrieve":
@@ -121,7 +121,7 @@ class MovieViewSet(
         if self.action == "upload-image":
             return MovieImageSerializer
 
-        return MovieSerializer
+        return self.serializer_class
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
