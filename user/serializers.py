@@ -71,4 +71,3 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
-
