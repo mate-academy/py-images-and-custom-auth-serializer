@@ -112,7 +112,6 @@ class MovieViewSet(
         detail=True,
         methods=["POST"],
         url_path="upload-image",
-        permission_classes=[IsAuthenticated]
     )
     def upload_image(self, request, pk=None) -> Response:
         movie = self.get_object()
