@@ -11,7 +11,6 @@ from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
-
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -97,7 +96,6 @@ class MovieViewSet(
     @action(
         methods=["POST"],
         detail=True,
-        permission_classes=[IsAdminUser],
         url_path="upload-image"
     )
     def upload_image(self, request, pk=None):
