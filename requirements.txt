@@ -6,3 +6,4 @@ pep8-naming==0.13.2
 django-debug-toolbar==3.2.4
 djangorestframework==3.13.1
 pillow==10.2.0
+black==24.3.0
