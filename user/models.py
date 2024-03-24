@@ -3,7 +3,7 @@ from django.utils.translation import gettext as _
 from django.contrib.auth.models import (
     AbstractUser,
     UserManager as DjangoUserManager,
-)  ## A new class is imported. ##
+)
 
 
 class UserManager(DjangoUserManager):
