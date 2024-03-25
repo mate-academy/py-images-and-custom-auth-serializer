@@ -9,5 +9,8 @@ venv/
 *.pyc
 **db.sqlite3
 media/
+<<<<<<< HEAD
 uploads/
 user/migrations/0002_alter_user_managers_remove_user_username_and_more.py
+=======
+>>>>>>> 1c5ea953500069c4368ed4db44f605729985e73e

@@ -54,14 +54,22 @@ class MovieListSerializer(MovieSerializer):
 
 
 class MovieDetailSerializer(MovieSerializer):
-    genres = GenreSerializer(read_only=True, many=True,)
+    genres = GenreSerializer(read_only=True, many=True, )
     actors = ActorSerializer(many=True, read_only=True)
 
 
 class MovieImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ("id", "image")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image"
+        )
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):

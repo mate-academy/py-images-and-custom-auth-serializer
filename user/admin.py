@@ -32,6 +32,7 @@ class UserAdmin(DjangoUserAdmin):
             {
                 "classes": ("wide",),
                 "fields": ("email", "password3", "password4"),
+
             },
         ),
     )
