@@ -1,6 +1,8 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from rest_framework.exceptions import ValidationError
+
+from cinema.utils import movie_image_file_path
 
 
 class CinemaHall(models.Model):
@@ -41,6 +43,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
 
     class Meta:
         ordering = ["title"]
@@ -92,14 +95,12 @@ class Ticket(models.Model):
         ]:
             count_attrs = getattr(cinema_hall, cinema_hall_attr_name)
             if not (1 <= ticket_attr_value <= count_attrs):
-                raise error_to_raise(
-                    {
-                        ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
-                        f"(1, {count_attrs})"
-                    }
-                )
+                raise error_to_raise({
+                    ticket_attr_name: f"{ticket_attr_name} "
+                    f"number must be in available range: "
+                    f"(1, {cinema_hall_attr_name}): "
+                    f"(1, {count_attrs})"
+                })
 
     def clean(self):
         Ticket.validate_ticket(
@@ -110,11 +111,11 @@ class Ticket(models.Model):
         )
 
     def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
     ):
         self.full_clean()
         return super(Ticket, self).save(
