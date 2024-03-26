@@ -42,9 +42,8 @@ class Actor(models.Model):
 
 def path_to_media(instance, file_name_hex):
     default_file_name, ext = os.path.splitext(file_name_hex)
-    uuid = uuid4()
 
-    file_name_hex = f"{slugify(instance.title)}-{uuid}{ext}"
+    file_name_hex = f"{slugify(instance.title)}-{uuid4()}{ext}"
 
     return os.path.join("uploads/movies/", file_name_hex)
 
