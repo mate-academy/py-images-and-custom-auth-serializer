@@ -1,6 +1,11 @@
+import os
+import uuid
+from typing import Union
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +40,29 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def create_custom_path(instance: Union["Movie", "MovieSession"], filename):
+    _, extension = os.path.splitext(filename)
+    if instance.__class__.__name__ == "Movie":
+        return os.path.join(
+            "uploads/movies/",
+            f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+        )
+    return os.path.join(
+        "uploads/movies/",
+        f"{slugify(instance.movie.title)}-{uuid.uuid4()}{extension}"
+    )
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(
+        null=True,
+        upload_to=create_custom_path
+    )
 
     class Meta:
         ordering = ["title"]
@@ -53,6 +75,10 @@ class MovieSession(models.Model):
     show_time = models.DateTimeField()
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     cinema_hall = models.ForeignKey(CinemaHall, on_delete=models.CASCADE)
+    image = models.ImageField(
+        null=True,
+        upload_to=create_custom_path
+    )
 
     class Meta:
         ordering = ["-show_time"]
@@ -94,10 +120,11 @@ class Ticket(models.Model):
             if not (1 <= ticket_attr_value <= count_attrs):
                 raise error_to_raise(
                     {
-                        ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
-                        f"(1, {count_attrs})"
+                        ticket_attr_name:
+                            f"{ticket_attr_name} "
+                            "number must be in available range: "
+                            f"(1, {cinema_hall_attr_name}): "
+                            f"(1, {count_attrs})"
                     }
                 )
 
@@ -110,11 +137,11 @@ class Ticket(models.Model):
         )
 
     def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
     ):
         self.full_clean()
         return super(Ticket, self).save(
