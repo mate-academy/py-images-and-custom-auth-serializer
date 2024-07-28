@@ -40,9 +40,8 @@ class Actor(models.Model):
 
 
 def create_custom_url(instance, filename):
-    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{Path(
-        filename
-    ).suffix}"
+    filename = (f"{slugify(instance.title)}-"
+                f"{uuid.uuid4()}{Path(filename).suffix}")
     return Path("upload/image/") / Path(filename)
 
 
