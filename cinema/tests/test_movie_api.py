@@ -112,7 +112,7 @@ class MovieImageUploadTests(TestCase):
                 url,
                 {
                     "title": "Title",
-                    "descriçption": "Description",
+                    "description": "Description",
                     "duration": 90,
                     "genres": [1],
                     "actors": [1],
