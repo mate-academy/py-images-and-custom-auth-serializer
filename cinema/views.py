@@ -1,11 +1,15 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+import PIL
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
@@ -102,6 +106,31 @@ class MovieViewSet(
             return MovieDetailSerializer
 
         return MovieSerializer
+
+    @action(detail=True, methods=["post"],
+            parser_classes=[MultiPartParser, FormParser])
+    def upload_image(self, request, pk=None):
+        movie = self.get_object()
+        if "image" not in request.data:
+            return Response(
+                {"detail": "No image provided"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        image = request.data["image"]
+        try:
+            img = PIL.Image.open(image)
+            img.verify()
+        except (IOError, SyntaxError):
+            return Response(
+                {"detail": "Uploaded file is not a valid image."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        movie.image = image
+        movie.save()
+        return Response({
+            "status": "image uploaded",
+            "image": movie.image.url
+        }, status=status.HTTP_200_OK)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):

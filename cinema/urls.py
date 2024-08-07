@@ -18,6 +18,10 @@ router.register("movies", MovieViewSet)
 router.register("movie_sessions", MovieSessionViewSet)
 router.register("orders", OrderViewSet)
 
-urlpatterns = [path("", include(router.urls))]
+urlpatterns = [path("", include(router.urls)),
+               path("movies/<int:pk>/upload-image/",
+                    MovieViewSet.as_view({"post": "upload_image"}),
+                    name="movie-upload-image"),
+               ]
 
 app_name = "cinema"
