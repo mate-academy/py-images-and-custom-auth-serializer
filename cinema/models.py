@@ -1,6 +1,11 @@
+import pathlib
+import uuid
+from pathlib import Path
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +40,22 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+# "http://127.0.0.1:8000/media/uploads/movies/liar-93733032-c097-4a38-9b2b-20404e7186e6.jpeg"
+
+def movie_image_path(instance: "Movie", filename: str) -> Path:
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}" + pathlib.Path(
+        filename
+    ).suffix
+    return pathlib.Path("upload/movies/") / pathlib.Path(filename)
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_path)
 
     class Meta:
         ordering = ["title"]
@@ -95,9 +110,9 @@ class Ticket(models.Model):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
-                        f"(1, {count_attrs})"
+                                          f"number must be in available range:"
+                                          f" (1, {cinema_hall_attr_name}): "
+                                          f"(1, {count_attrs})"
                     }
                 )
 
@@ -110,11 +125,11 @@ class Ticket(models.Model):
         )
 
     def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
     ):
         self.full_clean()
         return super(Ticket, self).save(
