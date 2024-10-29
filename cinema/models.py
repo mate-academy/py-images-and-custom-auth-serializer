@@ -1,6 +1,12 @@
+import os
+import uuid
+from pkgutil import extend_path
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 class CinemaHall(models.Model):
@@ -35,15 +41,23 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def uploads_movies(instance, filename):
+    extension = os.path.splitext(filename)[1]
+    filename = f"{slugify(instance.title)}-{uuid.uuid4().hex}{extension}"
+
+    return os.path.join("uploads", "images", filename)
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
-    genres = models.ManyToManyField(Genre)
-    actors = models.ManyToManyField(Actor)
+    genres = models.ManyToManyField("Genre")
+    actors = models.ManyToManyField("Actor")
+    image = models.ImageField(null=True, upload_to=uploads_movies)
 
-    class Meta:
-        ordering = ["title"]
+    # class Meta:
+    #     ordering = ["title"]
 
     def __str__(self):
         return self.title
