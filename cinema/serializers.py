@@ -1,5 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
 
 from cinema.models import (
     Genre,
@@ -31,9 +33,44 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
+    genres = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="name"
+    )
+    actors = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="full_name"
+    )
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Movie
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image"
+        )
+
+    def get_image(self, obj):
+        request = self.context.get("request")
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+
+
+class MovieCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = ("id", "title", "description", "duration", "genres", "actors")
+
+
+class MovieImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ("id", "image")
 
 
 class MovieListSerializer(MovieSerializer):
@@ -48,10 +85,25 @@ class MovieListSerializer(MovieSerializer):
 class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image"
+        )
+
+    def get_image(self, obj):
+        request = self.context.get("request")
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -69,6 +121,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
         source="cinema_hall.capacity", read_only=True
     )
     tickets_available = serializers.IntegerField(read_only=True)
+    movie_image = serializers.SerializerMethodField()
 
     class Meta:
         model = MovieSession
@@ -79,7 +132,14 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
+            "movie_image",
         )
+
+    def get_movie_image(self, obj):
+        request = self.context.get("request")
+        if obj.movie.image:
+            return request.build_absolute_uri(obj.movie.image.url)
+        return None
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -135,3 +195,35 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(OrderSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(label=_("Email"), write_only=True)
+    password = serializers.CharField(
+        label=_("Password"), style={
+            "input_type": "password"
+        },
+        trim_whitespace=False, write_only=True
+    )
+    token = serializers.CharField(label=_("Token"), read_only=True)
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(
+                request=self.context.get("request"),
+                username=email,
+                password=password
+            )
+
+            if not user:
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg, code="authorization")
+        else:
+            msg = _("Must include 'email' and 'password'.")
+            raise serializers.ValidationError(msg, code="authorization")
+
+        attrs["user"] = user
+        return attrs

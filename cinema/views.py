@@ -1,11 +1,16 @@
 from datetime import datetime
-
+from rest_framework import status
+from rest_framework.decorators import action
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from .serializers import AuthTokenSerializer, MovieCreateSerializer
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
@@ -21,7 +26,7 @@ from cinema.serializers import (
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
-    OrderListSerializer,
+    OrderListSerializer, MovieImageSerializer,
 )
 
 
@@ -58,15 +63,43 @@ class CinemaHallViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
-class MovieViewSet(
-    ReadOnlyModelViewSet,
-    mixins.CreateModelMixin,
-    GenericViewSet,
-):
+class MovieViewSet(ModelViewSet):
     queryset = Movie.objects.prefetch_related("genres", "actors")
-    serializer_class = MovieSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return MovieSerializer
+        if self.action == "retrieve":
+            return MovieDetailSerializer
+        if self.action == "create":
+            return MovieCreateSerializer
+        if self.action == "upload_image":
+            return MovieImageSerializer
+        return MovieSerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        permission_classes=[IsAdminUser],
+        url_path="upload-image",
+    )
+    def upload_image(self, request, pk=None):
+        """Endpoint to upload an image for a movie"""
+        movie = self.get_object()
+        serializer = self.get_serializer(movie, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
     @staticmethod
     def _params_to_ints(qs):
@@ -93,15 +126,6 @@ class MovieViewSet(
             queryset = queryset.filter(actors__id__in=actors_ids)
 
         return queryset.distinct()
-
-    def get_serializer_class(self):
-        if self.action == "list":
-            return MovieListSerializer
-
-        if self.action == "retrieve":
-            return MovieDetailSerializer
-
-        return MovieSerializer
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
@@ -143,6 +167,11 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
         return MovieSessionSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
 
 class OrderPagination(PageNumberPagination):
     page_size = 10
@@ -173,3 +202,17 @@ class OrderViewSet(
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class CustomAuthToken(ObtainAuthToken):
+    serializer_class = AuthTokenSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(
+            data=request.data,
+            context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key})
