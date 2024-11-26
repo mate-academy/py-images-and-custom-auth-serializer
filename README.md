@@ -47,8 +47,8 @@ GET http://127.0.0.1:8000/api/cinema/movie_sessions/
 ]
 ```
 2. Replace username field with email field in User model.
-3. Write custom AuthTokenSerializer, so you can obtain token with
-email and password
+   3. Write custom AuthTokenSerializer, so you can obtain token with
+   email and password
 
    
 ### Note: Check your code using this [checklist](checklist.md) before pushing your solution.
