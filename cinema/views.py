@@ -1,26 +1,36 @@
 from datetime import datetime
 
-from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from django.db.models import Count, F
+from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
-from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
+from cinema.models import (
+    Actor,
+    CinemaHall,
+    Genre,
+    Movie,
+    MovieSession,
+    Order,
+)
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
-
 from cinema.serializers import (
-    GenreSerializer,
     ActorSerializer,
     CinemaHallSerializer,
-    MovieSerializer,
-    MovieSessionSerializer,
-    MovieSessionListSerializer,
+    GenreSerializer,
+    MovieBaseSerializer,
     MovieDetailSerializer,
-    MovieSessionDetailSerializer,
+    MovieImageSerializer,
     MovieListSerializer,
-    OrderSerializer,
+    MovieSessionBaseSerializer,
+    MovieSessionDetailSerializer,
+    MovieSessionListSerializer,
+    OrderBaseSerializer,
     OrderListSerializer,
 )
 
@@ -64,14 +74,14 @@ class MovieViewSet(
     GenericViewSet,
 ):
     queryset = Movie.objects.prefetch_related("genres", "actors")
-    serializer_class = MovieSerializer
+    serializer_class = MovieBaseSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
-    def _params_to_ints(qs):
+    def _params_to_ints(query_string: str) -> list[int]:
         """Converts a list of string IDs to a list of integers"""
-        return [int(str_id) for str_id in qs.split(",")]
+        return [int(str_id) for str_id in query_string.split(",")]
 
     def get_queryset(self):
         """Retrieve the movies with filters"""
@@ -101,12 +111,29 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
-        return MovieSerializer
+        return MovieBaseSerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminOrIfAuthenticatedReadOnly],
+    )
+    def upload_image(self, request: Request, pk: int = None) -> Response:
+        """Endpoint to upload image to specific movie"""
+        movie = self.get_object()
+        serializer = MovieImageSerializer(movie, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
-        MovieSession.objects.all()
+        MovieSession.objects
         .select_related("movie", "cinema_hall")
         .annotate(
             tickets_available=(
@@ -115,7 +142,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
             )
         )
     )
-    serializer_class = MovieSessionSerializer
+    serializer_class = MovieSessionBaseSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
@@ -141,7 +168,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return MovieSessionDetailSerializer
 
-        return MovieSessionSerializer
+        return MovieSessionBaseSerializer
 
 
 class OrderPagination(PageNumberPagination):
@@ -154,22 +181,28 @@ class OrderViewSet(
     mixins.CreateModelMixin,
     GenericViewSet,
 ):
-    queryset = Order.objects.prefetch_related(
-        "tickets__movie_session__movie", "tickets__movie_session__cinema_hall"
-    )
-    serializer_class = OrderSerializer
+    queryset = Order.objects.all()
+    serializer_class = OrderBaseSerializer
     pagination_class = OrderPagination
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        queryset = Order.objects.filter(user=self.request.user)
+
+        if self.action == "list":
+            queryset = queryset.prefetch_related(
+                "tickets__movie_session__movie",
+                "tickets__movie_session__cinema_hall",
+            ).select_related("user")
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":
             return OrderListSerializer
 
-        return OrderSerializer
+        return OrderBaseSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
