@@ -1,6 +1,10 @@
+import os
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +39,21 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def create_custom_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    return os.path.join(
+        "uploads/movies/",
+        f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    )
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=create_custom_path)
 
     class Meta:
         ordering = ["title"]
@@ -84,30 +97,21 @@ class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
 
-    @staticmethod
-    def validate_ticket(row, seat, cinema_hall, error_to_raise):
-        for ticket_attr_value, ticket_attr_name, cinema_hall_attr_name in [
-            (row, "row", "rows"),
-            (seat, "seat", "seats_in_row"),
-        ]:
-            count_attrs = getattr(cinema_hall, cinema_hall_attr_name)
-            if not (1 <= ticket_attr_value <= count_attrs):
-                raise error_to_raise(
-                    {
-                        ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
-                        f"(1, {count_attrs})"
-                    }
-                )
-
     def clean(self):
-        Ticket.validate_ticket(
-            self.row,
-            self.seat,
-            self.movie_session.cinema_hall,
-            ValidationError,
-        )
+        if not (1 <= self.row <= self.movie_session.cinema_hall.rows):
+            raise ValidationError({
+                "row": (
+                    f"Row number must be between 1 and "
+                    f"{self.movie_session.cinema_hall.rows}."
+                )
+            })
+        if not (1 <= self.seat <= self.movie_session.cinema_hall.seats_in_row):
+            raise ValidationError({
+                "seat": (
+                    f"Seat number must be between 1 and "
+                    f"{self.movie_session.cinema_hall.seats_in_row}."
+                )
+            })
 
     def save(
         self,
