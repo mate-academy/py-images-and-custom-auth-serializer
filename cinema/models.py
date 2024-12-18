@@ -1,6 +1,12 @@
+import uuid
+from pathlib import Path
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+from django.utils import timezone
+from datetime import datetime
 
 
 class CinemaHall(models.Model):
@@ -38,15 +44,23 @@ class Actor(models.Model):
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    duration = models.IntegerField()
+    duration = models.IntegerField(default=90)
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(upload_to="uploads/movies/", blank=True)
 
     class Meta:
         ordering = ["title"]
 
     def __str__(self):
         return self.title
+
+    def rename_image_and_save(self, *args, **kwargs):
+        if self.image:
+            ext = Path(self.image.name).suffix
+            unique_id = uuid.uuid4()
+            self.image.name = f"{slugify(self.title)}-{unique_id}{ext}"
+        super().save(*args, **kwargs)
 
 
 class MovieSession(models.Model):
@@ -57,15 +71,22 @@ class MovieSession(models.Model):
     class Meta:
         ordering = ["-show_time"]
 
+    def save(self, *args, **kwargs):
+        if isinstance(self.show_time, str):
+            self.show_time =\
+                datetime.strptime(self.show_time, "%Y-%m-%d %H:%M:%S")
+        if timezone.is_naive(self.show_time):
+            self.show_time = timezone.make_aware(self.show_time)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.movie.title + " " + str(self.show_time)
 
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.created_at)
@@ -78,9 +99,8 @@ class Ticket(models.Model):
     movie_session = models.ForeignKey(
         MovieSession, on_delete=models.CASCADE, related_name="tickets"
     )
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets"
-    )
+    order = models.ForeignKey(Order, on_delete=models.CASCADE,
+                              related_name="tickets")
     row = models.IntegerField()
     seat = models.IntegerField()
 
@@ -123,7 +143,8 @@ class Ticket(models.Model):
 
     def __str__(self):
         return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
+            f"{str(self.movie_session)} "
+            f"(row: {self.row}, seat: {self.seat})"
         )
 
     class Meta:
