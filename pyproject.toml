@@ -1,0 +1,33 @@
+[tool.black]
+line-length = 79  # Максимальна довжина рядка (за замовчуванням 88)
+target-version = ["py38", "py39", "py310"]  # Цільові версії Python
+skip-string-normalization = false  # Не змінювати лапки у рядках (True/False "")
+include = '\.pyi?$'  # Включити лише Python файли (.py, .pyi)
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations/
+)/
+'''  # Шаблон для виключення файлів
+# pip install flake8-pyproject
+
+[tool.flake8]
+max-line-length = 79  # Максимальна довжина рядка
+extend-ignore = ["Q001"]  # Ігнорувати попередження Q001 (лапки)
+exclude = ".*/migrations/.*|.*/__pycache__/.*|.*\\.pyc"  # Виключити папки і
+#файли (регулярний вираз)
+ignore = [
+    "E203",  # Ігнорувати конкретні правила
+    "W503"
+]
+
+[tool.flake8.plugins]
+flake8-quotes = {string = "double"}  # Використовуємо подвійні лапки
