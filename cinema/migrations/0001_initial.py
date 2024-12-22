@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -107,7 +106,8 @@ class Migration(migrations.Migration):
                 (
                     "movie",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="cinema.movie"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="cinema.movie",
                     ),
                 ),
             ],
