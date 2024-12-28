@@ -1,10 +1,13 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
@@ -22,6 +25,7 @@ from cinema.serializers import (
     MovieListSerializer,
     OrderSerializer,
     OrderListSerializer,
+    MovieImageSerializer,
 )
 
 
@@ -68,6 +72,24 @@ class MovieViewSet(
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        url_name="upload-image",
+    )
+    def upload_image(self, request, pk=None):
+        """Upload an image to a movie"""
+        movie = self.get_object()
+        serializer = self.get_serializer(
+            instance=movie, data=request.data, partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @staticmethod
     def _params_to_ints(qs):
         """Converts a list of string IDs to a list of integers"""
@@ -101,7 +123,18 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
+        if self.action == "upload_image":
+            return MovieImageSerializer
+
         return MovieSerializer
+
+    def create(self, request, *args, **kwargs):
+        if self.action == "list":
+            raise MethodNotAllowed(
+                "POST",
+                detail="Cannot upload an image on the movie list endpoint."
+            )
+        return super().create(request, *args, **kwargs)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
