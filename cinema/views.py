@@ -10,6 +10,11 @@ from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
 
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
+
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -22,7 +27,37 @@ from cinema.serializers import (
     MovieListSerializer,
     OrderSerializer,
     OrderListSerializer,
+    MovieImageSerializer,
 )
+
+from rest_framework import generics
+from rest_framework.views import APIView
+
+
+class MovieImageUploadView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        movie_id = kwargs.get("id")  # Получаем ID фильма из URL
+        try:
+            movie = Movie.objects.get(id=movie_id)  # Получаем объект Movie
+        except Movie.DoesNotExist:
+            return Response({"error": "Movie not found"}, status=404)
+
+        serializer = MovieImageSerializer(movie,
+                                          data=request.data,
+                                          partial=True
+                                          )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+class MovieDetailView(generics.RetrieveAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
 
 
 class GenreViewSet(
@@ -102,6 +137,29 @@ class MovieViewSet(
             return MovieDetailSerializer
 
         return MovieSerializer
+
+    @action(detail=True, methods=["post"],
+            parser_classes=[MultiPartParser,
+                            FormParser]
+            )
+    def upload_image(self, request, pk=None):
+        """Upload an image to a movie"""
+        movie = self.get_object()
+        image = request.FILES.get("image")
+
+        if not image:
+            return Response(
+                {"error": "No image provided"},
+                status=HTTP_400_BAD_REQUEST
+            )
+
+        movie.image = image
+        movie.save()
+
+        return Response(
+            {"message": "Image uploaded successfully"},
+            status=HTTP_200_OK
+        )
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
