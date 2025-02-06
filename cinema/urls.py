@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-
+from django.conf.urls.static import static
 from cinema.views import (
     GenreViewSet,
     ActorViewSet,
@@ -9,6 +9,7 @@ from cinema.views import (
     MovieSessionViewSet,
     OrderViewSet,
 )
+from cinema_service import settings
 
 router = routers.DefaultRouter()
 router.register("genres", GenreViewSet)
@@ -18,6 +19,8 @@ router.register("movies", MovieViewSet)
 router.register("movie_sessions", MovieSessionViewSet)
 router.register("orders", OrderViewSet)
 
-urlpatterns = [path("", include(router.urls))]
+urlpatterns = [path("", include(router.urls))] + static(
+    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+)
 
 app_name = "cinema"
