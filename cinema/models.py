@@ -1,6 +1,10 @@
+import pathlib
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.template.defaultfilters import slugify
 
 
 class CinemaHall(models.Model):
@@ -28,11 +32,19 @@ class Actor(models.Model):
     last_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+
+def create_custom_path(movie: "Movie", filename: str):
+    filename = (
+        f"{slugify(movie.title)}-{uuid.uuid4()}"
+        + pathlib.Path(filename).suffix
+    )
+    return pathlib.Path("upload/movies/", filename)
 
 
 class Movie(models.Model):
@@ -41,6 +53,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(upload_to=create_custom_path, null=True)
 
     class Meta:
         ordering = ["title"]
@@ -58,20 +71,21 @@ class MovieSession(models.Model):
         ordering = ["-show_time"]
 
     def __str__(self):
-        return self.movie.title + " " + str(self.show_time)
+        return f"{self.movie.title} {self.show_time}"
 
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
     )
-
-    def __str__(self):
-        return str(self.created_at)
 
     class Meta:
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return str(self.created_at)
 
 
 class Ticket(models.Model):
@@ -94,10 +108,12 @@ class Ticket(models.Model):
             if not (1 <= ticket_attr_value <= count_attrs):
                 raise error_to_raise(
                     {
-                        ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
-                        f"(1, {count_attrs})"
+                        ticket_attr_name: (
+                            f"{ticket_attr_name} "
+                            f"number must be in available range:"
+                            f"(1, {cinema_hall_attr_name}): "
+                            f"(1, {count_attrs})"
+                        )
                     }
                 )
 
@@ -121,11 +137,9 @@ class Ticket(models.Model):
             force_insert, force_update, using, update_fields
         )
 
-    def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
-
     class Meta:
         unique_together = ("movie_session", "row", "seat")
         ordering = ["row", "seat"]
+
+    def __str__(self):
+        return f"{self.movie_session} (row: {self.row}, seat: {self.seat})"
