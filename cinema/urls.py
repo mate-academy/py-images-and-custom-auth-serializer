@@ -1,4 +1,7 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path, include
+
 from rest_framework import routers
 
 from cinema.views import (
@@ -8,6 +11,7 @@ from cinema.views import (
     MovieViewSet,
     MovieSessionViewSet,
     OrderViewSet,
+    MovieImageUploadView,
 )
 
 router = routers.DefaultRouter()
@@ -18,6 +22,19 @@ router.register("movies", MovieViewSet)
 router.register("movie_sessions", MovieSessionViewSet)
 router.register("orders", OrderViewSet)
 
-urlpatterns = [path("", include(router.urls))]
+urlpatterns = [
+    path("", include(router.urls)),
+    path(
+        "upload-image/<int:pk>",
+        MovieImageUploadView.as_view(),
+        name="movie-upload-image"
+    )
+]
 
 app_name = "cinema"
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

@@ -1,10 +1,14 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+
+from rest_framework import viewsets, mixins, generics, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
@@ -22,6 +26,7 @@ from cinema.serializers import (
     MovieListSerializer,
     OrderSerializer,
     OrderListSerializer,
+    MovieImageSerializer,
 )
 
 
@@ -155,7 +160,8 @@ class OrderViewSet(
     GenericViewSet,
 ):
     queryset = Order.objects.prefetch_related(
-        "tickets__movie_session__movie", "tickets__movie_session__cinema_hall"
+        "tickets__movie_session__movie",
+        "tickets__movie_session__cinema_hall"
     )
     serializer_class = OrderSerializer
     pagination_class = OrderPagination
@@ -173,3 +179,30 @@ class OrderViewSet(
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class MovieImageUploadView(APIView):
+    def get_queryset(self):
+        return Movie.objects.filter(id=self.kwargs["pk"])
+
+    def put(self, request: Request, *args, **kwargs) -> Response:
+        movie = self.get_queryset().first()
+        if not movie:
+            return Response(
+                {"detail": "Movie not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        if "image" not in request.FILES:
+            return Response(
+                {"detail": "No image provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        movie.image = request.FILES["image"]
+        movie.save()
+
+        serializer = MovieImageSerializer(movie)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        return self.put(request, *args, **kwargs)
