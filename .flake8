@@ -9,4 +9,3 @@ exclude =
     venv
     .venv
     tests
-    .\cinema_service\settings.py
