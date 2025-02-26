@@ -7,4 +7,6 @@ select = B,C,E,F,W,T4,B9,Q0,N8,VNE
 exclude =
     **migrations
     venv
+    .venv
     tests
+    .\cinema_service\settings.py
