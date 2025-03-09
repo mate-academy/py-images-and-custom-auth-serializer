@@ -99,7 +99,6 @@ class MovieViewSet(
         return queryset.distinct()
 
     def get_serializer_class(self):
-        print(self.action)
         if self.action == "list":
             return MovieListSerializer
 

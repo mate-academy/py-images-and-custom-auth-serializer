@@ -8,3 +8,5 @@ exclude =
     **migrations
     venv
     tests
+per-file-ignores =
+    settings.py: E501
