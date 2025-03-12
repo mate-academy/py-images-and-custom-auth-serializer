@@ -38,12 +38,14 @@ class Actor(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+
 def image_path(instance: "Movie", filename: str) -> str:
-    _, extionsion = os.path.splitext(filename)
+    _, extension = os.path.splitext(filename)
     return os.path.join(
         "uploads/images/",
         f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
     )
+
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
