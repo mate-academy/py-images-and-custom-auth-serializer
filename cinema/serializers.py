@@ -34,6 +34,14 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = ("id", "title", "description", "duration", "genres", "actors")
+        read_only_fields = ("image",)
+
+
+class MovieImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ("image",)
 
 
 class MovieListSerializer(MovieSerializer):
