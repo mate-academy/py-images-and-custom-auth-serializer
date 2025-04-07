@@ -33,7 +33,16 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = (
+            "id", "title", "description", "duration",
+            "genres", "actors"
+        )
+
+
+class MovieImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ("id", "image")
 
 
 class MovieListSerializer(MovieSerializer):
@@ -44,6 +53,13 @@ class MovieListSerializer(MovieSerializer):
         many=True, read_only=True, slug_field="full_name"
     )
 
+    class Meta:
+        model = Movie
+        fields = (
+            "id", "title", "description", "duration",
+            "genres", "actors", "image"
+        )
+
 
 class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
@@ -51,13 +67,24 @@ class MovieDetailSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = (
+            "id", "title", "description", "duration",
+            "genres", "actors", "image"
+        )
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
+    movie_image = serializers.SerializerMethodField()
+
     class Meta:
         model = MovieSession
-        fields = ("id", "show_time", "movie", "cinema_hall")
+        fields = ("id", "show_time", "movie", "cinema_hall", "movie_image")
+
+    def get_movie_image(self, obj):
+        request = self.context.get("request")
+        if obj.movie.image:
+            return request.build_absolute_uri(obj.movie.image.url)
+        return None
 
 
 class MovieSessionListSerializer(MovieSessionSerializer):
@@ -79,6 +106,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
+            "movie_image"
         )
 
 
