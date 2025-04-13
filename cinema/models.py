@@ -1,6 +1,10 @@
+import pathlib
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.template.defaultfilters import slugify
 
 
 class CinemaHall(models.Model):
@@ -34,6 +38,10 @@ class Actor(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+def movie_image_path(instance: "Movie", filename: str) -> pathlib.Path:
+    filename = f"{slugify(instance.title)}--{uuid.uuid4()}" + pathlib.Path(filename).suffix
+    return pathlib.Path("upload/movie") / pathlib.Path(filename)
+
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
@@ -41,6 +49,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_path)
 
     class Meta:
         ordering = ["title"]
@@ -53,6 +62,10 @@ class MovieSession(models.Model):
     show_time = models.DateTimeField()
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     cinema_hall = models.ForeignKey(CinemaHall, on_delete=models.CASCADE)
+    movie_image = models.ImageField(
+        null=True,
+        upload_to=movie_image_path
+    )
 
     class Meta:
         ordering = ["-show_time"]
