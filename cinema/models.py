@@ -1,6 +1,10 @@
+import uuid
+from pathlib import Path
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +39,20 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def unique_movie_img_path(instance, filename):
+    return f"{slugify(instance.title)}-{uuid.uuid4()}{Path(filename).suffix}"
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(
+        null=True,
+        upload_to=unique_movie_img_path
+    )
 
     class Meta:
         ordering = ["title"]
