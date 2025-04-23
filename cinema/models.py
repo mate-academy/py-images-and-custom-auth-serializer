@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.db.models import UniqueConstraint
 
 
 class CinemaHall(models.Model):
@@ -41,6 +42,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to="uploads/")
 
     class Meta:
         ordering = ["title"]
@@ -127,5 +129,10 @@ class Ticket(models.Model):
         )
 
     class Meta:
-        unique_together = ("movie_session", "row", "seat")
+        constraints = [
+            UniqueConstraint(
+                fields=["row", "seat", "movie_session"],
+                name="unique_row_seat_movie_session",
+            ),
+        ]
         ordering = ["row", "seat"]
