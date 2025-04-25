@@ -11,7 +11,6 @@ from cinema.models import (
     Order,
 )
 
-
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
@@ -46,7 +45,15 @@ class MovieListSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors", "image")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image"
+        )
 
 
 class MovieDetailSerializer(MovieSerializer):
@@ -55,11 +62,19 @@ class MovieDetailSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors", "image")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image"
+        )
 
 
 class MovieImageSerializer(serializers.ModelSerializer):
-   class Meta:
+    class Meta:
        model = Movie
        fields = ("id", "image")
 
