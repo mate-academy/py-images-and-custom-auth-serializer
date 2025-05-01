@@ -7,7 +7,7 @@ from cinema.views import (
     CinemaHallViewSet,
     MovieViewSet,
     MovieSessionViewSet,
-    OrderViewSet,
+    OrderViewSet, MovieImageUploadView,
 )
 
 router = routers.DefaultRouter()
@@ -18,6 +18,11 @@ router.register("movies", MovieViewSet)
 router.register("movie_sessions", MovieSessionViewSet)
 router.register("orders", OrderViewSet)
 
-urlpatterns = [path("", include(router.urls))]
+urlpatterns = [
+    path("upload-image/<int:pk>/",
+         MovieImageUploadView.as_view(),
+         name="movie-upload-image"),
+    path("", include(router.urls))
+]
 
 app_name = "cinema"
