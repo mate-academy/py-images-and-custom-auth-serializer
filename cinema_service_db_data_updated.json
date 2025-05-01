@@ -1,0 +1,198 @@
+[
+  {
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$320000$9VYqPyRGfYBmDkEzYHuGzF$+0/Hs+pKnO5Pu+0/Hs+pKnO5PuXXXXXXXXXXXXXXXXXXXXXXXXX=",
+      "last_login": "2024-03-19T12:00:00Z",
+      "is_superuser": true,
+      "first_name": "Admin",
+      "last_name": "User",
+      "email": "admin.user@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-03-19T12:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "cinema.cinemahall",
+    "pk": 1,
+    "fields": {
+      "name": "Ricciotto Canudo",
+      "rows": 25,
+      "seats_in_row": 30
+    }
+  },
+  {
+    "model": "cinema.cinemahall",
+    "pk": 2,
+    "fields": {
+      "name": "Robin Wood",
+      "rows": 24,
+      "seats_in_row": 18
+    }
+  },
+  {
+    "model": "cinema.cinemahall",
+    "pk": 3,
+    "fields": {
+      "name": "Peter Wollen",
+      "rows": 30,
+      "seats_in_row": 20
+    }
+  },
+  {
+    "model": "cinema.cinemahall",
+    "pk": 4,
+    "fields": {
+      "name": "Jean Mitry",
+      "rows": 14,
+      "seats_in_row": 8
+    }
+  },
+  {
+    "model": "cinema.genre",
+    "pk": 1,
+    "fields": {
+      "name": "Crime"
+    }
+  },
+  {
+    "model": "cinema.genre",
+    "pk": 2,
+    "fields": {
+      "name": "Drama"
+    }
+  },
+  {
+    "model": "cinema.genre",
+    "pk": 3,
+    "fields": {
+      "name": "Thriller"
+    }
+  },
+  {
+    "model": "cinema.genre",
+    "pk": 4,
+    "fields": {
+      "name": "Action"
+    }
+  },
+  {
+    "model": "cinema.genre",
+    "pk": 5,
+    "fields": {
+      "name": "Adventure"
+    }
+  },
+  {
+    "model": "cinema.genre",
+    "pk": 6,
+    "fields": {
+      "name": "Sci-Fi"
+    }
+  },
+  {
+    "model": "cinema.genre",
+    "pk": 7,
+    "fields": {
+      "name": "Mystery"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 1,
+    "fields": {
+      "first_name": "Jack",
+      "last_name": "Nicholson"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 2,
+    "fields": {
+      "first_name": "Leonardo",
+      "last_name": "DiCaprio"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 3,
+    "fields": {
+      "first_name": "Matt",
+      "last_name": "Damon"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 4,
+    "fields": {
+      "first_name": "Joseph",
+      "last_name": "Gordon-Levitt"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 5,
+    "fields": {
+      "first_name": "Elliot",
+      "last_name": "Page"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 6,
+    "fields": {
+      "first_name": "Bruce",
+      "last_name": "Willis"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 7,
+    "fields": {
+      "first_name": "Emily",
+      "last_name": "Blunt"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 8,
+    "fields": {
+      "first_name": "Samuel",
+      "last_name": "Jackson"
+    }
+  },
+  {
+    "model": "cinema.actor",
+    "pk": 9,
+    "fields": {
+      "first_name": "Robin",
+      "last_name": "Wright"
+    }
+  },
+  {
+    "model": "cinema.movie",
+    "pk": 1,
+    "fields": {
+      "title": "The Departed",
+      "description": "An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irish gang in South Boston.",
+      "duration": 151,
+      "genres": [1, 2, 3],
+      "actors": [1, 2, 3]
+    }
+  },
+  {
+    "model": "cinema.movie",
+    "pk": 2,
+    "fields": {
+      "title": "Inception",
+      "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+      "duration": 148,
+      "genres": [4, 5, 6],
+      "actors": [2, 4, 5]
+    }
+  }
+]
