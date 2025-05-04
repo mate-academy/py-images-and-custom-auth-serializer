@@ -61,6 +61,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "cinema_service.urls"
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
 TEMPLATES = [
     {
@@ -125,7 +127,7 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

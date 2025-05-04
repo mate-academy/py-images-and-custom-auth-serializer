@@ -1,0 +1,13 @@
+[tool.black]
+line-length = 79
+target-version = ['py311']
+skip-string-normalization = true
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.venv
+  | build
+  | dist
+  | migrations
+)/
+'''
