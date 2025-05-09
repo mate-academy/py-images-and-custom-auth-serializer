@@ -116,7 +116,6 @@ class MovieImageUploadTests(TestCase):
                     "duration": 90,
                     "genres": [1],
                     "actors": [1],
-                    "image": ntf,
                 },
                 format="multipart",
             )
