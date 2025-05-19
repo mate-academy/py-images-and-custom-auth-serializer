@@ -1,6 +1,10 @@
+import os
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +39,21 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def upload_movie_image(instance: "Movie", filename: str) -> str:
+    _, extension = os.path.splitext(filename)
+    return os.path.join(
+        "uploads/images/",
+        f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    )
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=upload_movie_image)
 
     class Meta:
         ordering = ["title"]
@@ -67,11 +80,11 @@ class Order(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
 
-    def __str__(self):
-        return str(self.created_at)
-
     class Meta:
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return str(self.created_at)
 
 
 class Ticket(models.Model):
@@ -121,11 +134,11 @@ class Ticket(models.Model):
             force_insert, force_update, using, update_fields
         )
 
+    class Meta:
+        unique_together = ("movie_session", "row", "seat")
+        ordering = ["row", "seat"]
+
     def __str__(self):
         return (
             f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
         )
-
-    class Meta:
-        unique_together = ("movie_session", "row", "seat")
-        ordering = ["row", "seat"]
