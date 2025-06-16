@@ -2,6 +2,17 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 
+from django.utils.text import slugify
+import os
+import uuid
+from django.contrib.auth.models import AbstractUser
+
+
+def movie_image_file_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
+    return os.path.join("uploads/movies/", filename)
+
 
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
@@ -41,12 +52,13 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(upload_to=movie_image_file_path, null=True, blank=True)
 
     class Meta:
         ordering = ["title"]
 
     def __str__(self):
-        return self.title
+        return self.title 
 
 
 class MovieSession(models.Model):
@@ -129,3 +141,13 @@ class Ticket(models.Model):
     class Meta:
         unique_together = ("movie_session", "row", "seat")
         ordering = ["row", "seat"]
+
+class User(AbstractUser):
+    username = None
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return self.email
