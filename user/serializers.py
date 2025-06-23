@@ -24,7 +24,10 @@ class AuthTokenSerializer(serializers.Serializer):
             )
             if not user:
                 raise serializers.ValidationError(
-                    {"detail": _("Unable to authenticate with provided credentials")},
+                    {
+                        "detail": _(
+                            "Unable to authenticate "
+                            "with provided credentials")},
                     code="authorization"
                 )
         else:
