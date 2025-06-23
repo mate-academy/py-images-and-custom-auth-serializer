@@ -126,7 +126,7 @@ class MovieSessionListSerializer(serializers.ModelSerializer):
     movie_image = serializers.SerializerMethodField()
     cinema_hall_name = serializers.CharField(
         source="cinema_hall.name",
-        ead_only=True)
+        read_only=True)
     cinema_hall_capacity = serializers.IntegerField(
         source="cinema_hall.capacity",
         read_only=True)
