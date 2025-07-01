@@ -39,9 +39,9 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def bus_image_path(instance, filename):
+def movie_image_path(instance, filename):
     filename = f"{ slugify(instance.info)}-{uuid.uuid4()}" + pathlib.Path(filename).suffix
-    return pathlib.Path("upload/buses/") / pathlib.Path(filename)
+    return pathlib.Path("upload/movies/") / pathlib.Path(filename)
 
 
 class Movie(models.Model):
@@ -50,7 +50,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
-    image = models.ImageField(null=True, blank=True, upload_to="movie_image_path")
+    image = models.ImageField(null=True, blank=True, upload_to=movie_image_path)
 
     class Meta:
         ordering = ["title"]
