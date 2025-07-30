@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+exclude = ["migrations", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "Q", "N", "B", "I"]
+ignore = ["E501"]  # Довгі рядки, якщо хочеш дозволити
+
+[tool.ruff.format]
+quote-style = "single"  # або "double", якщо хочеш подвійні лапки
