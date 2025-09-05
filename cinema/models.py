@@ -1,6 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+import uuid
+import os
 
 
 class CinemaHall(models.Model):
@@ -35,12 +38,22 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def movie_image_upload_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    unique_id = uuid.uuid4()
+    filename = f"{slugify(instance.title)}-{unique_id}{ext}"
+    return os.path.join("uploads", "movies", filename)
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(
+        upload_to=movie_image_upload_path, null=True, blank=True
+    )
 
     class Meta:
         ordering = ["title"]
@@ -107,18 +120,6 @@ class Ticket(models.Model):
             self.seat,
             self.movie_session.cinema_hall,
             ValidationError,
-        )
-
-    def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-    ):
-        self.full_clean()
-        return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
         )
 
     def __str__(self):

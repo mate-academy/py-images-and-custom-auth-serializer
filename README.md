@@ -8,7 +8,7 @@ Read [the guideline](https://github.com/mate-academy/py-task-guideline/blob/main
   - Login: `admin.user`
   - Password: `1qazcde3`
 
-### In this task you will work with images and add auth token serializer
+## In this task you will work with images and add auth token serializer
 
 1. Add ImageField `image` to the `Movie` model.
    - Upload images should be only available with `/upload-image/` endpoint.
