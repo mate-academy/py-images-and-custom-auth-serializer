@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.utils.translation import gettext_lazy as _
 
 
@@ -30,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class CustomSerializer(serializers.Serializer):
+class AuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(label=_("Email address"))
     password = serializers.CharField(
         label=_("Password"),
@@ -44,8 +43,8 @@ class CustomSerializer(serializers.Serializer):
 
         user = authenticate(
             request=self.context.get("request"),
-            username=email,
-            password=password,
+            email=email,
+            password=password
         )
 
         if not user:
