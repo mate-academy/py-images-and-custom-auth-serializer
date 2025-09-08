@@ -31,13 +31,14 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(read_only=True)
+
     class Meta:
         model = Movie
-        fields = (
-            "id", "title",
-            "description", "duration",
-            "genres", "actors", "image")
-        read_only_fields = ("image",)
+        fields = ("id", "title",
+                  "description", "duration",
+                  "genres", "actors", "image")
+        read_only_fields = ("id",)
 
 
 class MovieListSerializer(MovieSerializer):
@@ -145,6 +146,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class UploadImageSerializer(serializers.Serializer):
     image = serializers.ImageField()
+
+    def validate_image(self, value):
+        if not value:
+            raise serializers.ValidationError("No image provided")
+        return value
 
 
 class OrderListSerializer(OrderSerializer):

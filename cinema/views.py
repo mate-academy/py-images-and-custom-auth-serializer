@@ -5,12 +5,10 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import (
-    IsAuthenticated, IsAuthenticatedOrReadOnly)
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
@@ -65,34 +63,16 @@ class CinemaHallViewSet(
 
 
 class MovieViewSet(
-    ReadOnlyModelViewSet,
     mixins.CreateModelMixin,
-    GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
 ):
-    queryset = Movie.objects.prefetch_related("genres", "actors")
+    queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
-    parser_classes = (MultiPartParser, FormParser)
-
-    @action(
-        methods=["POST"],
-        detail=True,
-        url_path="upload-image",
-        permission_classes=[IsAdminOrIfAuthenticatedReadOnly],
-        parser_classes=[MultiPartParser, FormParser],
-
-    )
-    def upload_image(self, request, pk=None):
-        movie = self.get_object()
-        serializer = UploadImageSerializer(data=request.data)
-        if serializer.is_valid():
-            movie.image = serializer.validated_data["image"]
-            movie.save()
-            return Response(
-                self.get_serializer(movie).data, status=status.HTTP_200_OK
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     @staticmethod
     def _params_to_ints(qs):
@@ -129,22 +109,24 @@ class MovieViewSet(
 
         return MovieSerializer
 
-
-class UploadImageView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def post(self, request, *args, **kwargs):
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        parser_classes=[MultiPartParser, FormParser],
+    )
+    def upload_image(self, request, pk=None):
+        movie = self.get_object()
         serializer = UploadImageSerializer(data=request.data)
+
         if serializer.is_valid():
+            movie.image = serializer.validated_data["image"]
+            movie.save()
             return Response(
-                {"message": "Image uploaded"},
-                status=status.HTTP_200_OK
+                MovieSerializer(movie, context={"request": request}).data,
+                status=status.HTTP_200_OK,
             )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
