@@ -36,7 +36,19 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "description", "duration", "genres", "actors")
 
 
+class MovieImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ("id", "image")
+
+
 class MovieListSerializer(MovieSerializer):
+
+    class Meta:
+        model = Movie
+        fields = MovieSerializer.Meta.fields + ("image",)
+
     genres = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="name"
     )
@@ -51,7 +63,7 @@ class MovieDetailSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = MovieSerializer.Meta.fields + ("image",)
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -68,6 +80,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
     cinema_hall_capacity = serializers.IntegerField(
         source="cinema_hall.capacity", read_only=True
     )
+    movie_image = serializers.ImageField(source="movie.image", read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -76,6 +89,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "id",
             "show_time",
             "movie_title",
+            "movie_image",
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
