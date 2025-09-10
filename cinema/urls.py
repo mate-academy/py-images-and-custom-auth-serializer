@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework import routers
 
@@ -18,6 +20,12 @@ router.register("movies", MovieViewSet)
 router.register("movie_sessions", MovieSessionViewSet)
 router.register("orders", OrderViewSet)
 
-urlpatterns = [path("", include(router.urls))]
+movie_upload = MovieViewSet.as_view({"post": "upload_image"})
+
+
+urlpatterns = [
+    path("", include(router.urls)),
+    path("upload-image/", movie_upload, name="movie-upload-image")
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 app_name = "cinema"
