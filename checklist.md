@@ -1,10 +1,10 @@
 # Сheck Your Code Against the Following Points
 
-## Make sure you don't push the media directory and images
+## Make sure you don"t push the media directory and images
 
 ## Code Efficiency
 
-Don't use `serializers.CharField` while adding an image.
+Don"t use `serializers.CharField` while adding an image.
 
 Good example:
 
@@ -19,7 +19,7 @@ movie_image = serializers.CharField(...)
 ```
 
 ## Code Style
-1. Make sure you've added a blank line at the end to all your files.
+1. Make sure you"ve added a blank line at the end to all your files.
 
 2. Group imports using `()` if needed.
 
@@ -51,4 +51,4 @@ from django.contrib.auth.mixins import (
 
 ## Clean Code
 Add comments, prints, and functions to check your solution when you write your code. 
-Don't forget to delete them when you are ready to commit and push your code.
+Don"t forget to delete them when you are ready to commit and push your code.
