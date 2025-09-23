@@ -46,6 +46,7 @@ def movie_image_path_maker(instance, filename):
         f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
     )
 
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
