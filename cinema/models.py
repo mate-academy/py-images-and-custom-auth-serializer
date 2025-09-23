@@ -1,3 +1,6 @@
+import uuid
+import os
+from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
@@ -35,12 +38,22 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def movie_image_file_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    title_slug = slugify(instance.title)
+    uuid_slug = uuid.uuid4()
+    return f"uploads/movies/{title_slug}-{uuid_slug}{ext}"
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(upload_to=movie_image_file_path,
+                              blank=True,
+                              null=True)
 
     class Meta:
         ordering = ["title"]
