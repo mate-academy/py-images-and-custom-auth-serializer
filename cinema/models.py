@@ -7,7 +7,6 @@ from django.conf import settings
 from django.utils.text import slugify
 
 
-
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
