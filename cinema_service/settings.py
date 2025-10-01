@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+from django.db.models.utils import make_model_tuple
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -114,6 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Usuário customizado (email como identificador)
 AUTH_USER_MODEL = "user.User"
 
 # Internationalization
@@ -125,7 +129,7 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -137,3 +141,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Arquivos de mídia (upload de imagens de filmes)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

@@ -1,21 +1,15 @@
-from django.db import transaction
 from rest_framework import serializers
 
 from cinema.models import (
-    Genre,
     Actor,
     CinemaHall,
+    Genre,
     Movie,
     MovieSession,
     Ticket,
     Order,
 )
-
-
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = ("id", "name")
+from django.db import transaction
 
 
 class ActorSerializer(serializers.ModelSerializer):
@@ -30,10 +24,28 @@ class CinemaHallSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "rows", "seats_in_row", "capacity")
 
 
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ("id", "name")
+
+
 class MovieSerializer(serializers.ModelSerializer):
+    # imagem não pode ser enviada no POST padrão; apenas leitura
+    image = serializers.ImageField(read_only=True)
+
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image",
+        )
+        read_only_fields = ("id", "image")
 
 
 class MovieListSerializer(MovieSerializer):
@@ -51,7 +63,22 @@ class MovieDetailSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image",
+        )
+
+
+class MovieImageUploadSerializer(serializers.Serializer):
+    """
+    Serializer usado somente para upload de imagem via endpoint dedicado.
+    """
+    image = serializers.ImageField()
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -69,6 +96,15 @@ class MovieSessionListSerializer(MovieSessionSerializer):
         source="cinema_hall.capacity", read_only=True
     )
     tickets_available = serializers.IntegerField(read_only=True)
+    # adiciona a URL da imagem do filme nesta sessão
+    movie_image = serializers.SerializerMethodField(read_only=True)
+
+    def get_movie_image(self, obj):
+        request = self.context.get("request")
+        if getattr(obj.movie, "image", None) and obj.movie.image:
+            url = obj.movie.image.url
+            return request.build_absolute_uri(url) if request else url
+        return None
 
     class Meta:
         model = MovieSession
@@ -79,6 +115,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
+            "movie_image",
         )
 
 

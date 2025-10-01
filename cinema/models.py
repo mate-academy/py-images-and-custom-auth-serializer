@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from uuid import uuid4
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +37,25 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def movie_image_upload_to(instance, filename):
+    """
+    uploads/movies/{slug}-{uuid}{ext}
+    """
+    parts = filename.rsplit(".", 1)
+    ext = f".{parts[1]}" if len(parts) == 2 else ""
+    slug = slugify(getattr(instance, "title", "movie"))
+    return f"uploads/movies/{slug}-{uuid4()}{ext}"
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(
+        upload_to=movie_image_upload_to, null=True, blank=True
+    )
 
     class Meta:
         ordering = ["title"]
