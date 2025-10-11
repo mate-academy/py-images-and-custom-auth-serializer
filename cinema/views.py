@@ -5,6 +5,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
@@ -79,7 +80,8 @@ class MovieViewSet(
     @action(
         detail=True,
         methods=["POST"],
-        url_path="upload-image"
+        url_path="upload-image",
+        parser_classes = (MultiPartParser, FormParser)
     )
     def upload_image(self, request, pk=None):
         movie = self.get_object()

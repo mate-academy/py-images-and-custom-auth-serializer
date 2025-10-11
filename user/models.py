@@ -97,7 +97,7 @@ class User(AbstractUser):
             "unique": "A user with that username already exists.",
         },
     )
-    email = models.EmailField("email", blank=True, unique=True)
+    email = models.EmailField("email", blank=False, null=False, unique=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

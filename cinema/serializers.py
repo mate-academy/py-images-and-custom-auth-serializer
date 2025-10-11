@@ -43,6 +43,8 @@ class MovieImageSerializer(serializers.ModelSerializer):
 
 
 class MovieListSerializer(MovieSerializer):
+    image = serializers.ImageField(read_only=True)
+
     genres = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="name"
     )
@@ -57,6 +59,7 @@ class MovieListSerializer(MovieSerializer):
 class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
+    image = serializers.ImageField(read_only=True)
 
     class Meta:
         model = Movie
@@ -86,10 +89,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
         source="cinema_hall.capacity", read_only=True
     )
     tickets_available = serializers.IntegerField(read_only=True)
-    movie_image = serializers.SerializerMethodField(
-        source="get_movie_image",
-        read_only=True
-    )
+    movie_image = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = MovieSession
@@ -106,10 +106,10 @@ class MovieSessionListSerializer(MovieSessionSerializer):
     def get_movie_image(self, obj):
         request = self.context.get("request")
 
-        try:
+        if request is not None and hasattr(obj.movie, "image") and obj.movie.image:
             return request.build_absolute_uri(obj.movie.image.url)
-        except (ValueError, AttributeError):
-            return None
+
+        return None
 
 
 class TicketSerializer(serializers.ModelSerializer):

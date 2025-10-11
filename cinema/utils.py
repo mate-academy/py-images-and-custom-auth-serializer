@@ -4,8 +4,8 @@ from pathlib import Path
 from django.utils.text import slugify
 
 
-def create_movie_image_url(instance: str, filename: str) -> Path:
+def create_movie_image_url(instance: str, filename: str) -> str:
     ext = Path(filename).suffix
-    path = f"{slugify(instance.title)}-{uuid4()}{ext}"
+    path = f"{slugify(instance.title)}-{uuid4().hex}{ext}"
 
-    return Path("upload/movies/") / Path(path)
+    return str(Path(path))
