@@ -9,3 +9,7 @@ venv/
 *.pyc
 **db.sqlite3
 .venv/
+/media/
+/media/*
+/media/uploads/
+/media/uploads/movies/

@@ -1,14 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import (
     AbstractUser,
-    BaseUserManager,
     UserManager as DjangoUserManager,
 )
 from django.utils.translation import gettext as _
 
 
 class UserManager(DjangoUserManager):
-    """Define a model manager for User model with no username field."""
+    """Model manager for User model that uses email as the login field."""
 
     use_in_migrations = True
 

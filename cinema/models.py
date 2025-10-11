@@ -39,10 +39,10 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-def movie_image_path(movie: "Movie", filename: str) -> pathlib.Path:
-    filename = (f"{slugify(movie.title)}-{uuid.uuid4()}"
+def movie_image_path(movie: "Movie", filename: str) -> str:
+    filename = (f"{slugify(movie.title)}-{str(uuid.uuid4())}"
                 + pathlib.Path(filename).suffix)
-    return pathlib.Path("upload/movies/") / pathlib.Path(filename)
+    return str(pathlib.Path("uploads/movies/") / pathlib.Path(filename))
 
 
 class Movie(models.Model):
