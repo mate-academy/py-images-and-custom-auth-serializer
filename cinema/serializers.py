@@ -103,12 +103,13 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "tickets_available",
         )
 
-    @staticmethod
-    def get_movie_image(obj):
-        if obj.movie.image:
-            return obj.movie.image.url
+    def get_movie_image(self, obj):
+        request = self.context.get("request")
 
-        return None
+        try:
+            return request.build_absolute_uri(obj.movie.image.url)
+        except (ValueError, AttributeError):
+            return None
 
 
 class TicketSerializer(serializers.ModelSerializer):
