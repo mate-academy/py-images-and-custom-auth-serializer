@@ -10,7 +10,7 @@ class CustomAuthTokenSerializer(serializers.Serializer):
     )
     password = serializers.CharField(
         label=_("Password"),
-        style={'input_type': 'password'},
+        style={"input_type": "password"},
         trim_whitespace=False,
         write_only=True
     )
@@ -20,33 +20,39 @@ class CustomAuthTokenSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
+        email = attrs.get("email")
+        password = attrs.get("password")
 
         if email and password:
-            user = authenticate(request=self.context.get('request'),
+            user = authenticate(request=self.context.get("request"),
                                 username=email, password=password)
 
             # The authenticate call simply returns None for is_active=False
             # users. (Assuming the default ModelBackend authentication
             # backend.)
             if not user:
-                msg = _('Unable to log in with provided credentials.')
-                raise serializers.ValidationError(msg, code='authorization')
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg, code="authorization")
         else:
-            msg = _('Must include "username" and "password".')
-            raise serializers.ValidationError(msg, code='authorization')
+            msg = _("Must include 'username' and 'password'.")
+            raise serializers.ValidationError(msg, code="authorization")
 
-        attrs['user'] = user
+        attrs["user"] = user
         return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ("id", "email", "username", "password", "is_staff")
+        fields = ("id", "email", "password", "is_staff")
         read_only_fields = ("is_staff",)
-        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
+        extra_kwargs = {
+            "password": {
+                "write_only": True,
+                "min_length": 5,
+                "style": {"input_type": "password"}
+            }
+        }
 
     def create(self, validated_data):
         """Create a new user with encrypted password and return it"""
