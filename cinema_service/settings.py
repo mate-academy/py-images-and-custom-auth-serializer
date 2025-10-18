@@ -140,7 +140,7 @@ MEDIA_URL = "/media/"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "cinema.permissions.IsAdminOrIfAuthenticatedReadOnly"
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication"
