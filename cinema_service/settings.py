@@ -139,8 +139,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES_CLASSES": [
-        "station.permissions.IsAdminAllORAuthenticatedOrReadOnly"
+    "DEFAULT_PERMISSION_CLASSES": [
+        "cinema.permissions.IsAdminOrIfAuthenticatedReadOnly"
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication"
