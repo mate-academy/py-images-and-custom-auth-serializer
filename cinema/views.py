@@ -75,7 +75,8 @@ class MovieViewSet(
         detail=True,
         url_path="upload-image",
         url_name="upload-image",
-        permission_classes=[IsAdminUser]
+        permission_classes=[IsAdminUser],
+        parser_classes=[parsers.MultiPartParser]
     )
     def upload_image(self, request, pk=None):
         movie = self.get_object()
