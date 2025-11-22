@@ -40,7 +40,7 @@ class AuthTokenSerializer(serializers.Serializer):
         email = attrs.get("email")
         password = attrs.get("password")
 
-        if not (email or password):
+        if not email or not password:
             msg = _("Must include email and password")
             raise serializers.ValidationError(msg, code="authorization")
 
