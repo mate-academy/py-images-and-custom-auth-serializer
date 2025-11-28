@@ -1,6 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+import uuid
+from pathlib import Path
+
+
+def movie_image_upload_path(instance, filename):
+    ext = Path(filename).suffix
+    slug = slugify(instance.title)
+    return f"uploads/movies/{slug}-{uuid.uuid4()}{ext}"
 
 
 class CinemaHall(models.Model):
@@ -28,7 +37,7 @@ class Actor(models.Model):
     last_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def full_name(self):
@@ -41,6 +50,9 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(
+        upload_to=movie_image_upload_path, blank=True, null=True
+    )
 
     class Meta:
         ordering = ["title"]
@@ -58,7 +70,7 @@ class MovieSession(models.Model):
         ordering = ["-show_time"]
 
     def __str__(self):
-        return self.movie.title + " " + str(self.show_time)
+        return f"{self.movie.title} {self.show_time}"
 
 
 class Order(models.Model):
@@ -94,10 +106,11 @@ class Ticket(models.Model):
             if not (1 <= ticket_attr_value <= count_attrs):
                 raise error_to_raise(
                     {
-                        ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
-                        f"(1, {count_attrs})"
+                        ticket_attr_name: (
+                            f"{ticket_attr_name} number must be in "
+                            f"available range: (1, {cinema_hall_attr_name}): "
+                            f"(1, {count_attrs})"
+                        )
                     }
                 )
 
@@ -117,13 +130,16 @@ class Ticket(models.Model):
         update_fields=None,
     ):
         self.full_clean()
-        return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
+        return super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
         )
 
     def __str__(self):
         return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
+            f"{self.movie_session} (row: {self.row}, seat: {self.seat})"
         )
 
     class Meta:
