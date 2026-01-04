@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 
+from base.AuthCustomTokenSerializer import AuthCustomTokenSerializer
 from user.serializers import UserSerializer
 
 
@@ -13,6 +14,7 @@ class CreateUserView(generics.CreateAPIView):
 
 class CreateTokenView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+    serializer_class = AuthCustomTokenSerializer
 
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
