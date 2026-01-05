@@ -1,5 +1,4 @@
 # Images and custom auth token serializer
-
 Read [the guideline](https://github.com/mate-academy/py-task-guideline/blob/main/README.md) before starting.
 - Download [ModHeader](https://chrome.google.com/webstore/detail/modheader/idgpnmonknjnojddfkpgkljpfnnfcklj?hl=en)
 - Use the following command to load prepared data from fixture to test and debug your code:
