@@ -1,4 +1,5 @@
 import os
+import pathlib
 import uuid
 
 from django.core.exceptions import ValidationError
@@ -40,12 +41,9 @@ class Actor(models.Model):
 
 
 def movie_custom_path(instance, filename):
-   _, ext = os.path.splitext(filename)
-   return os.path.join(
-       "uploads/movies/",
-       f"{slugify(instance.title)}-{uuid}{ext}"
-   )
-
+    filename = (f"{slugify(instance.title)}-{uuid.uuid4()}"
+                + pathlib.Path(filename).suffix)
+    return pathlib.Path("upload/movies/") / pathlib.Path(filename)
 
 
 class Movie(models.Model):
@@ -54,7 +52,9 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
-    image = models.ImageField(null=True, blank=True, upload_to=movie_custom_path)
+    image = models.ImageField(
+        null=True, blank=True, upload_to=movie_custom_path
+    )
 
     class Meta:
         ordering = ["title"]
