@@ -1,5 +1,7 @@
 from django.db import transaction
-from rest_framework import serializers
+from rest_framework import (
+    serializers,
+)
 
 from cinema.models import (
     Genre,
@@ -44,6 +46,13 @@ class MovieListSerializer(MovieSerializer):
         many=True, read_only=True, slug_field="full_name"
     )
 
+    class Meta:
+        model = Movie
+        fields = (
+            "id", "title", "description", "duration",
+            "genres", "actors", "image"
+        )
+
 
 class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
@@ -51,7 +60,16 @@ class MovieDetailSerializer(MovieSerializer):
 
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = (
+            "id", "title", "description", "duration",
+            "genres", "actors", "image"
+        )
+
+
+class MovieImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ("id", "image")
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -62,6 +80,7 @@ class MovieSessionSerializer(serializers.ModelSerializer):
 
 class MovieSessionListSerializer(MovieSessionSerializer):
     movie_title = serializers.CharField(source="movie.title", read_only=True)
+    movie_image = serializers.ImageField(source="movie.image", read_only=True)
     cinema_hall_name = serializers.CharField(
         source="cinema_hall.name", read_only=True
     )
@@ -76,6 +95,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "id",
             "show_time",
             "movie_title",
+            "movie_image",
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
@@ -84,9 +104,12 @@ class MovieSessionListSerializer(MovieSessionSerializer):
 
 class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
-        data = super(TicketSerializer, self).validate(attrs=attrs)
+        data = super().validate(attrs)
         Ticket.validate_ticket(
-            attrs["row"], attrs["seat"], attrs["movie_session"]
+            attrs["row"],
+            attrs["seat"],
+            attrs["movie_session"].cinema_hall,
+            serializers.ValidationError
         )
         return data
 
@@ -106,7 +129,7 @@ class TicketSeatsSerializer(TicketSerializer):
 
 
 class MovieSessionDetailSerializer(MovieSessionSerializer):
-    movie = MovieListSerializer(many=False, read_only=True)
+    movie = MovieDetailSerializer(many=False, read_only=True)
     cinema_hall = CinemaHallSerializer(many=False, read_only=True)
     taken_places = TicketSeatsSerializer(
         source="tickets", many=True, read_only=True
@@ -128,8 +151,11 @@ class OrderSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             tickets_data = validated_data.pop("tickets")
             order = Order.objects.create(**validated_data)
-            for ticket_data in tickets_data:
-                Ticket.objects.create(order=order, **ticket_data)
+            tickets = [
+                Ticket(order=order, **ticket_data)
+                for ticket_data in tickets_data
+            ]
+            Ticket.objects.bulk_create(tickets)
             return order
 
 
