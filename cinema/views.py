@@ -1,15 +1,27 @@
 from datetime import datetime
-
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+
+from rest_framework import mixins, status
+from rest_framework.viewsets import (
+    GenericViewSet,
+    ModelViewSet,
+    ReadOnlyModelViewSet,
+)
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 
-from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
+from cinema.models import (
+    Genre,
+    Actor,
+    CinemaHall,
+    Movie,
+    MovieSession,
+    Order,
+)
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
-
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -74,7 +86,6 @@ class MovieViewSet(
         return [int(str_id) for str_id in qs.split(",")]
 
     def get_queryset(self):
-        """Retrieve the movies with filters"""
         title = self.request.query_params.get("title")
         genres = self.request.query_params.get("genres")
         actors = self.request.query_params.get("actors")
@@ -103,8 +114,30 @@ class MovieViewSet(
 
         return MovieSerializer
 
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_path="upload-image",
+        permission_classes=[IsAdminOrIfAuthenticatedReadOnly],
+    )
+    def upload_image(self, request, pk=None):
+        movie = self.get_object()
+        image_file = request.FILES.get("image")
 
-class MovieSessionViewSet(viewsets.ModelViewSet):
+        if not image_file:
+            return Response(
+                {"detail": "No image file provided."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        movie.image = image_file
+        movie.save()
+
+        serializer = self.get_serializer(movie)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MovieSessionViewSet(ModelViewSet):
     queryset = (
         MovieSession.objects.all()
         .select_related("movie", "cinema_hall")
