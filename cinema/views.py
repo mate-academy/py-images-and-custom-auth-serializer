@@ -4,30 +4,58 @@ from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 
-from cinema.models import Movie
+from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession
+
 from cinema.serializers import (
+    GenreSerializer,
+    ActorSerializer,
+    CinemaHallSerializer,
     MovieSerializer,
     MovieListSerializer,
     MovieDetailSerializer,
     MovieImageSerializer,
-    CustomAuthTokenSerializer,
+    MovieSessionSerializer,
+    MovieSessionListSerializer,
+    MovieSessionDetailSerializer,
+    AuthTokenSerializer,
 )
 
+
+class CreateTokenView(ObtainAuthToken):
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+    serializer_class = AuthTokenSerializer
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+
+
+class ActorViewSet(viewsets.ModelViewSet):
+    queryset = Actor.objects.all()
+    serializer_class = ActorSerializer
+
+
+class CinemaHallViewSet(viewsets.ModelViewSet):
+    queryset = CinemaHall.objects.all()
+    serializer_class = CinemaHallSerializer
+
+
 class MovieViewSet(viewsets.ModelViewSet):
-    queryset = Movie.objects.all()
+    queryset = Movie.objects.prefetch_related("genres", "actors")
     serializer_class = MovieSerializer
 
     def get_serializer_class(self):
         if self.action == "list":
             return MovieListSerializer
-        
+
         if self.action == "retrieve":
             return MovieDetailSerializer
-            
+
         if self.action == "upload_image":
             return MovieImageSerializer
-            
-        return MovieSerializer
+
+        return self.serializer_class
 
     @action(
         methods=["POST"],
@@ -46,8 +74,18 @@ class MovieViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Create the login view using the Custom Serializer
-class CreateTokenView(ObtainAuthToken):
-    serializer_class = CustomAuthTokenSerializer
-    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
-    
+class MovieSessionViewSet(viewsets.ModelViewSet):
+    queryset = (
+        MovieSession.objects.all()
+        .select_related("movie", "cinema_hall")
+    )
+    serializer_class = MovieSessionSerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return MovieSessionListSerializer
+
+        if self.action == "retrieve":
+            return MovieSessionDetailSerializer
+
+        return self.serializer_class
