@@ -1,7 +1,29 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify  # Import necessário para slugify
+import uuid  # Import necessário para UUID
 
+
+# --- Funções de Upload Personalizadas ---
+
+def movie_image_path(instance, filename):
+    """
+    Gera o caminho de upload para a imagem do filme no formato:
+    f"{slugify(movie.title)}-{uuid}{ext}"
+    """
+    # Obtém a extensão do arquivo
+    ext = '.' + filename.split('.')[-1]
+    # Cria a parte base do nome do arquivo usando o título slugificado
+    filename_base = slugify(instance.title)
+    # Gera um UUID único
+    unique_id = uuid.uuid4()
+
+    # Retorna o caminho completo dentro do diretório de mídia
+    return f'uploads/movies/{filename_base}-{unique_id}{ext}'
+
+
+# --- Modelos Existentes (Sem alterações exigidas) ---
 
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
@@ -41,6 +63,9 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+
+    # ADIÇÃO: ImageField para a imagem do filme
+    image = models.ImageField(upload_to=movie_image_path, null=True, blank=True)
 
     class Meta:
         ordering = ["title"]
@@ -95,9 +120,9 @@ class Ticket(models.Model):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
-                        f"(1, {count_attrs})"
+                                          f"number must be in available range: "
+                                          f"(1, {cinema_hall_attr_name}): "
+                                          f"(1, {count_attrs})"
                     }
                 )
 
@@ -110,11 +135,11 @@ class Ticket(models.Model):
         )
 
     def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
     ):
         self.full_clean()
         return super(Ticket, self).save(

@@ -8,6 +8,7 @@ from cinema.views import (
     MovieViewSet,
     MovieSessionViewSet,
     OrderViewSet,
+    MovieImageUploadView,  # Import da nova View
 )
 
 router = routers.DefaultRouter()
@@ -18,6 +19,13 @@ router.register("movies", MovieViewSet)
 router.register("movie_sessions", MovieSessionViewSet)
 router.register("orders", OrderViewSet)
 
-urlpatterns = [path("", include(router.urls))]
+urlpatterns = [
+    # Rota para o endpoint de upload de imagem
+    # Nota: A view que adicionei (MovieImageUploadView) espera 'movie_id' na URL
+    path("upload-image/<int:movie_id>/", MovieImageUploadView.as_view(), name="movie-image-upload"),
+
+    # Rotas dos ViewSets
+    path("", include(router.urls))
+]
 
 app_name = "cinema"

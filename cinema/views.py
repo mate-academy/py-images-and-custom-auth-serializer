@@ -6,6 +6,11 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.views import APIView  # Import necessário para a nova view
+from rest_framework.parsers import MultiPartParser, FormParser  # Import necessário para upload de arquivo
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404  # Import necessário para get_object_or_404
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
@@ -64,6 +69,8 @@ class MovieViewSet(
     GenericViewSet,
 ):
     queryset = Movie.objects.prefetch_related("genres", "actors")
+    # O serializer_class padrão pode ser para criação (se não tiver o campo image)
+    # ou o que você preferir como base, mas get_serializer_class cuida disso.
     serializer_class = MovieSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
@@ -101,7 +108,42 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
+        # Para 'create' (POST), retorna o serializador que não expõe/espera a imagem
         return MovieSerializer
+
+
+# NOVO: View para upload de imagem
+class MovieImageUploadView(APIView):
+    """
+    Endpoint para fazer upload da imagem de um filme existente.
+    URL esperada: /upload-image/<int:movie_id>/
+    Requer autenticação e permissão de administrador/proprietário.
+    """
+    parser_classes = (MultiPartParser, FormParser)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)  # Usando a permissão existente
+
+    def post(self, request, movie_id, format=None):
+        # Certifique-se de que 'movie_id' seja passado pela URL
+        movie = get_object_or_404(Movie, pk=movie_id)
+
+        # Verifica se o arquivo 'image' foi enviado
+        file_obj = request.FILES.get('image')
+        if not file_obj:
+            return Response({"error": "Nenhum arquivo de imagem fornecido."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # O Django/ImageField cuida da validação do formato e do salvamento
+        # com o nome de arquivo gerado pela função movie_image_path
+        movie.image = file_obj
+        movie.save()
+
+        # Retorna o URL da imagem salva (usando .url)
+        return Response({
+            "id": movie.id,
+            "title": movie.title,
+            "message": "Imagem atualizada com sucesso.",
+            "image_url": movie.image.url  # Deve usar .url para obter a URL completa
+        }, status=status.HTTP_200_OK)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
@@ -110,8 +152,8 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         .select_related("movie", "cinema_hall")
         .annotate(
             tickets_available=(
-                F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
-                - Count("tickets")
+                    F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
+                    - Count("tickets")
             )
         )
     )
