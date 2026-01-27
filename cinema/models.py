@@ -1,12 +1,34 @@
+import pathlib
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
+
+def bus_image_path(instance: "Bus", filename: str):
+    filename = f"{slugify(instance.info)} + {uuid.uuid4()}" + pathlib.Path(filename).suffix
+    return pathlib.Path("upload/bus/") / pathlib.Path(filename)
+
+
+class Bus(models.Model):
+
+    info = models.CharField(max_length=255, null=True)
+    num_seats = models.IntegerField()
+    facilities = models.ManyToManyField("Facility", related_name = "buses")
+    image = models.ImageField(null=True, upload_to=bus_image_path)
+
+    # path: media/upload/bus/
+    # filename: <bus>-<random>.<ext>
+
+    class Meta:
+        verbose_name_plural = "buses"
 
     @property
     def capacity(self) -> int:
