@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model, authenticate
-from pyexpat.errors import messages
 from rest_framework import serializers
 from django.utils.translation import gettext as _
 
