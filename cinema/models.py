@@ -1,5 +1,6 @@
 import pathlib
 import uuid
+from typing import Any
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -29,6 +30,12 @@ class Bus(models.Model):
 
     class Meta:
         verbose_name_plural = "buses"
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(args, kwargs)
+        self.seats_in_row = None
+        self.name = None
+        self.rows = None
 
     @property
     def capacity(self) -> int:

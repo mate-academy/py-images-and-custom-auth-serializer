@@ -73,6 +73,7 @@ class MovieViewSet(
         """Converts a list of string IDs to a list of integers"""
         return [int(str_id) for str_id in qs.split(",")]
 
+    @property
     def get_queryset(self):
         """Retrieve the movies with filters"""
         title = self.request.query_params.get("title")
@@ -110,8 +111,8 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         .select_related("movie", "cinema_hall")
         .annotate(
             tickets_available=(
-                F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
-                - Count("tickets")
+                    F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
+                    - Count("tickets")
             )
         )
     )
