@@ -1,41 +1,52 @@
 import pathlib
 import uuid
-from typing import Any
-
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
 from django.utils.text import slugify
 
 
-class CinemaHall(models.Model):
-    name = models.CharField(max_length=255)
-    rows = models.IntegerField()
-    seats_in_row = models.IntegerField()
+# --- Auxiliares ---
 
 def bus_image_path(instance: "Bus", filename: str):
     filename = f"{slugify(instance.info)} + {uuid.uuid4()}" + pathlib.Path(filename).suffix
     return pathlib.Path("upload/bus/") / pathlib.Path(filename)
 
+# --- Modelos de Transporte (Bus) ---
+
+class Facility(models.Model):
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name_plural = "facilities"
+
+    def __str__(self):
+        return self.name
+
 
 class Bus(models.Model):
-
     info = models.CharField(max_length=255, null=True)
     num_seats = models.IntegerField()
-    facilities = models.ManyToManyField("Facility", related_name = "buses")
-    image = models.ImageField(null=True, upload_to=bus_image_path)
-
-    # path: media/upload/bus/
-    # filename: <bus>-<random>.<ext>
+    facilities = models.ManyToManyField("Facility", related_name="buses")
+    image = models.ImageField(null=True, upload_to='')
 
     class Meta:
         verbose_name_plural = "buses"
 
-    def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(args, kwargs)
-        self.seats_in_row = None
-        self.name = None
-        self.rows = None
+    @property
+    def capacity(self) -> int:
+        return self.num_seats
+
+    def __str__(self):
+        return self.info if self.info else f"Bus {self.id}"
+
+
+# --- Modelos de Cinema ---
+
+class CinemaHall(models.Model):
+    name = models.CharField(max_length=255)
+    rows = models.IntegerField()
+    seats_in_row = models.IntegerField()
 
     @property
     def capacity(self) -> int:
@@ -57,7 +68,7 @@ class Actor(models.Model):
     last_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def full_name(self):
@@ -68,8 +79,8 @@ class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
-    genres = models.ManyToManyField(Genre)
-    actors = models.ManyToManyField(Actor)
+    genres = models.ManyToManyField(Genre, related_name="movies")
+    actors = models.ManyToManyField(Actor, related_name="movies")
 
     class Meta:
         ordering = ["title"]
@@ -80,27 +91,27 @@ class Movie(models.Model):
 
 class MovieSession(models.Model):
     show_time = models.DateTimeField()
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    cinema_hall = models.ForeignKey(CinemaHall, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="movie_sessions")
+    cinema_hall = models.ForeignKey(CinemaHall, on_delete=models.CASCADE, related_name="movie_sessions")
 
     class Meta:
         ordering = ["-show_time"]
 
     def __str__(self):
-        return self.movie.title + " " + str(self.show_time)
+        return f"{self.movie.title} em {self.cinema_hall.name} ({self.show_time})"
 
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders"
     )
-
-    def __str__(self):
-        return str(self.created_at)
 
     class Meta:
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Order {self.id} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
 
 
 class Ticket(models.Model):
@@ -113,6 +124,10 @@ class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
 
+    class Meta:
+        unique_together = ("movie_session", "row", "seat")
+        ordering = ["row", "seat"]
+
     @staticmethod
     def validate_ticket(row, seat, cinema_hall, error_to_raise):
         for ticket_attr_value, ticket_attr_name, cinema_hall_attr_name in [
@@ -123,9 +138,8 @@ class Ticket(models.Model):
             if not (1 <= ticket_attr_value <= count_attrs):
                 raise error_to_raise(
                     {
-                        ticket_attr_name: f"{ticket_attr_name} "
+                        ticket_attr_name: f"{ticket_attr_name.capitalize()} "
                         f"number must be in available range: "
-                        f"(1, {cinema_hall_attr_name}): "
                         f"(1, {count_attrs})"
                     }
                 )
@@ -138,23 +152,9 @@ class Ticket(models.Model):
             ValidationError,
         )
 
-    def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-    ):
+    def save(self, *args, **kwargs):
         self.full_clean()
-        return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
-        )
+        return super().save(*args, **kwargs)
 
     def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
-
-    class Meta:
-        unique_together = ("movie_session", "row", "seat")
-        ordering = ["row", "seat"]
+        return f"{self.movie_session} (Fileira: {self.row}, Assento: {self.seat})"
