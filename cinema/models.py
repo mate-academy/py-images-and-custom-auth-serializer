@@ -1,6 +1,9 @@
-from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.text import slugify
+import os
+import uuid
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 
 class CinemaHall(models.Model):
@@ -35,12 +38,23 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def movie_image_file_path(instance, filename):
+    ext = os.path.splitext(filename)[1]  # .jpg / .png
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
+    return os.path.join("uploads/movies/", filename)
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(
+        upload_to=movie_image_file_path,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ["title"]
@@ -64,7 +78,8 @@ class MovieSession(models.Model):
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -78,9 +93,7 @@ class Ticket(models.Model):
     movie_session = models.ForeignKey(
         MovieSession, on_delete=models.CASCADE, related_name="tickets"
     )
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets"
-    )
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")  # noqa 501
     row = models.IntegerField()
     seat = models.IntegerField()
 
@@ -122,9 +135,7 @@ class Ticket(models.Model):
         )
 
     def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
+        return f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"  # noqa 501
 
     class Meta:
         unique_together = ("movie_session", "row", "seat")
