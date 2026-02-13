@@ -75,6 +75,7 @@ class MovieDetailSerializer(MovieSerializer):
             "actors",
             "image"
         )
+        read_only_fields = ("id", "image")
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):

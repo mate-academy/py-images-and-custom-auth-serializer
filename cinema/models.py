@@ -1,5 +1,4 @@
 import os
-import pathlib
 import uuid
 
 from django.core.exceptions import ValidationError
@@ -143,3 +142,4 @@ class Ticket(models.Model):
     class Meta:
         unique_together = ("movie_session", "row", "seat")
         ordering = ["row", "seat"]
+
