@@ -1,6 +1,16 @@
+import uuid
+import os
+
+from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+
+
+def movie_image_file_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
+    return os.path.join("uploads/movies/", filename)
 
 
 class CinemaHall(models.Model):
@@ -41,6 +51,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
 
     class Meta:
         ordering = ["title"]
@@ -63,9 +74,8 @@ class MovieSession(models.Model):
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.created_at)
@@ -94,8 +104,8 @@ class Ticket(models.Model):
             if not (1 <= ticket_attr_value <= count_attrs):
                 raise error_to_raise(
                     {
-                        ticket_attr_name: f"{ticket_attr_name} "
-                        f"number must be in available range: "
+                        ticket_attr_name: f"{ticket_attr_name} number "
+                        f"must be in available range: "
                         f"(1, {cinema_hall_attr_name}): "
                         f"(1, {count_attrs})"
                     }
@@ -109,17 +119,9 @@ class Ticket(models.Model):
             ValidationError,
         )
 
-    def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-    ):
+    def save(self, *args, **kwargs):
         self.full_clean()
-        return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
-        )
+        return super(Ticket, self).save(*args, **kwargs)
 
     def __str__(self):
         return (
