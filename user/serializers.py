@@ -16,9 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
                 "label": _("Password"),
             }
         }
-        # extra_kwargs = dict(
-        #     password=dict(write_only=True, min_length=8, style={"input_type": "password"})
-        # )
 
     def create(self, validated_data):
         """Create a new user with encrypted password and return it."""
@@ -52,7 +49,9 @@ class AuthTokenSerializer(serializers.Serializer):
 
         if email and password:
             user = authenticate(
-                request=self.context.get("request"), email=email, password=password
+                request=self.context.get("request"),
+                email=email,
+                password=password,
             )
 
             if not user:
