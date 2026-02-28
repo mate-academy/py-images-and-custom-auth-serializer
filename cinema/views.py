@@ -119,7 +119,11 @@ class MovieViewSet(
 
         return MovieSerializer
 
-    @action(detail=True, methods=["POST"])
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_path="upload-image",
+    )
     def upload_image(self, request, pk=None):
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
