@@ -105,7 +105,8 @@ class TicketSerializer(serializers.ModelSerializer):
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(attrs["row"],
                                attrs["seat"],
-                               attrs["movie_session"])
+                               attrs["movie_session"].cinema_hall,
+                               serializers.ValidationError)
         return data
 
     class Meta:
