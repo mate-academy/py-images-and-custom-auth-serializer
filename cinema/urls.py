@@ -14,8 +14,13 @@ router = routers.DefaultRouter()
 router.register("genres", GenreViewSet)
 router.register("actors", ActorViewSet)
 router.register("cinema_halls", CinemaHallViewSet)
-router.register("movies", MovieViewSet)
-router.register("movie_sessions", MovieSessionViewSet)
+
+# Add basename="movie" to match the test requirements
+router.register("movies", MovieViewSet, basename="movie")
+
+# Add basename="moviesession" for consistency
+router.register("movie_sessions", MovieSessionViewSet, basename="moviesession")
+
 router.register("orders", OrderViewSet)
 
 urlpatterns = [path("", include(router.urls))]
