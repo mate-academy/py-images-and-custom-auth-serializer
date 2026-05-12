@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
-from .models import (
+from user.models import User
+from cinema.models import (
     CinemaHall,
     Genre,
     Actor,
