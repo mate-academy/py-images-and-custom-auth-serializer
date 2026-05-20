@@ -7,7 +7,6 @@ from django.contrib.auth.models import (
 
 
 class UserManager(DjangoUserManager):
-    """Define a model manager for User model with no username field."""
 
     use_in_migrations = True
 

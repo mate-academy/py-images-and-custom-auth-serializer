@@ -44,11 +44,7 @@ def bus_image_path(instance, filename):
         f"{slugify(instance.title)}-{uuid.uuid4()}"
         + pathlib.Path(filename).suffix
     )
-    return (
-        pathlib.Path("upload/movies/")
-        / pathlib.Path(settings.MEDIA_ROOT)
-        / filename
-    )
+    return f"uploads/movies/{filename}"
 
 
 class Movie(models.Model):
