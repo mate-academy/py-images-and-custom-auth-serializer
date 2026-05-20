@@ -45,7 +45,7 @@ def bus_image_path(instance, filename):
         + pathlib.Path(filename).suffix
     )
     return (
-        pathlib.Path("upload/buses/")
+        pathlib.Path("upload/movies/")
         / pathlib.Path(settings.MEDIA_ROOT)
         / filename
     )
