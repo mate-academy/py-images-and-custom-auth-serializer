@@ -1,15 +1,27 @@
+from __future__ import annotations
+
 from datetime import datetime
 
-from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from django.db.models import F, Count, QuerySet
+from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
-from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
+from cinema.models import (
+    Genre,
+    Actor,
+    CinemaHall,
+    Movie,
+    MovieSession,
+    Order,
+)
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
-
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -20,6 +32,7 @@ from cinema.serializers import (
     MovieDetailSerializer,
     MovieSessionDetailSerializer,
     MovieListSerializer,
+    MovieImageSerializer,
     OrderSerializer,
     OrderListSerializer,
 )
@@ -69,15 +82,15 @@ class MovieViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
-    def _params_to_ints(qs):
-        """Converts a list of string IDs to a list of integers"""
+    def _params_to_ints(qs: str) -> list[int]:
+        """Converts a comma-separated string of IDs to integers."""
         return [int(str_id) for str_id in qs.split(",")]
 
-    def get_queryset(self):
-        """Retrieve the movies with filters"""
-        title = self.request.query_params.get("title")
-        genres = self.request.query_params.get("genres")
-        actors = self.request.query_params.get("actors")
+    def get_queryset(self) -> QuerySet[Movie]:
+        """Retrieve movies with optional filters."""
+        title: str | None = self.request.query_params.get("title")
+        genres: str | None = self.request.query_params.get("genres")
+        actors: str | None = self.request.query_params.get("actors")
 
         queryset = self.queryset
 
@@ -94,14 +107,34 @@ class MovieViewSet(
 
         return queryset.distinct()
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[Serializer]:
         if self.action == "list":
             return MovieListSerializer
-
         if self.action == "retrieve":
             return MovieDetailSerializer
-
+        if self.action == "upload_image":
+            return MovieImageSerializer
         return MovieSerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+    )
+    def upload_image(
+        self, request: Request, pk: int | None = None
+    ) -> Response:
+        """Upload an image to a specific movie."""
+        movie: Movie = self.get_object()
+        serializer: Serializer = self.get_serializer(
+            movie, data=request.data
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data, status=status.HTTP_200_OK
+        )
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
@@ -110,7 +143,8 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         .select_related("movie", "cinema_hall")
         .annotate(
             tickets_available=(
-                F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
+                F("cinema_hall__rows")
+                * F("cinema_hall__seats_in_row")
                 - Count("tickets")
             )
         )
@@ -119,28 +153,28 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def get_queryset(self):
-        date = self.request.query_params.get("date")
-        movie_id_str = self.request.query_params.get("movie")
+    def get_queryset(self) -> QuerySet[MovieSession]:
+        date: str | None = self.request.query_params.get("date")
+        movie_id_str: str | None = (
+            self.request.query_params.get("movie")
+        )
 
         queryset = self.queryset
 
         if date:
-            date = datetime.strptime(date, "%Y-%m-%d").date()
-            queryset = queryset.filter(show_time__date=date)
+            parsed_date = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(show_time__date=parsed_date)
 
         if movie_id_str:
             queryset = queryset.filter(movie_id=int(movie_id_str))
 
         return queryset
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[Serializer]:
         if self.action == "list":
             return MovieSessionListSerializer
-
         if self.action == "retrieve":
             return MovieSessionDetailSerializer
-
         return MovieSessionSerializer
 
 
@@ -155,21 +189,21 @@ class OrderViewSet(
     GenericViewSet,
 ):
     queryset = Order.objects.prefetch_related(
-        "tickets__movie_session__movie", "tickets__movie_session__cinema_hall"
+        "tickets__movie_session__movie",
+        "tickets__movie_session__cinema_hall",
     )
     serializer_class = OrderSerializer
     pagination_class = OrderPagination
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Order]:
         return Order.objects.filter(user=self.request.user)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[Serializer]:
         if self.action == "list":
             return OrderListSerializer
-
         return OrderSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user=self.request.user)
