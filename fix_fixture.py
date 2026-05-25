@@ -19,7 +19,7 @@ def fix_fixture(path: pathlib.Path) -> None:
     data: list[dict] = json.loads(path.read_text(encoding="utf-8"))
 
     for obj in data:
-        if obj.get("model") != "auth.user":
+        if obj.get("model") != "user.user":
             continue
 
         fields: dict = obj["fields"]
