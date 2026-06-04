@@ -116,12 +116,11 @@ class MovieViewSet(
         permission_classes=[IsAdminOrIfAuthenticatedReadOnly],
     )
     def upload_image(self, request, pk=None):
+        """Endpoint for uploading images to a specific movie"""
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
 
-        if serializer.is_value_valid() if hasattr(
-                serializer, "is_value_valid"
-        ) else serializer.is_valid():
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 
