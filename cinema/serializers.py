@@ -1,4 +1,6 @@
+from django.contrib.auth import authenticate
 from django.db import transaction
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from cinema.models import (
@@ -33,7 +35,16 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "duration",
+            "genres",
+            "actors",
+            "image",
+        )
+        read_only_fields = ("id", "image")
 
 
 class MovieListSerializer(MovieSerializer):
@@ -49,9 +60,11 @@ class MovieDetailSerializer(MovieSerializer):
     genres = GenreSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
 
+
+class MovieImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ("id", "title", "description", "duration", "genres", "actors")
+        fields = ("id", "image")
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
@@ -62,6 +75,7 @@ class MovieSessionSerializer(serializers.ModelSerializer):
 
 class MovieSessionListSerializer(MovieSessionSerializer):
     movie_title = serializers.CharField(source="movie.title", read_only=True)
+    movie_image = serializers.ImageField(source="movie.image", read_only=True)
     cinema_hall_name = serializers.CharField(
         source="cinema_hall.name", read_only=True
     )
@@ -76,6 +90,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "id",
             "show_time",
             "movie_title",
+            "movie_image",
             "cinema_hall_name",
             "cinema_hall_capacity",
             "tickets_available",
@@ -106,7 +121,7 @@ class TicketSeatsSerializer(TicketSerializer):
 
 
 class MovieSessionDetailSerializer(MovieSessionSerializer):
-    movie = MovieListSerializer(many=False, read_only=True)
+    movie = MovieDetailSerializer(many=False, read_only=True)
     cinema_hall = CinemaHallSerializer(many=False, read_only=True)
     taken_places = TicketSeatsSerializer(
         source="tickets", many=True, read_only=True
@@ -135,3 +150,33 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(OrderSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(label=_("Email"))
+    password = serializers.CharField(
+        label=_("Password"),
+        style={"input_type": "password"},
+        trim_whitespace=False,
+    )
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(
+                request=self.context.get("request"),
+                username=email,
+                password=password,
+            )
+
+            if not user:
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg, code="authorization")
+        else:
+            msg = _('Must include "email" and "password".')
+            raise serializers.ValidationError(msg, code="authorization")
+
+        attrs["user"] = user
+        return attrs
