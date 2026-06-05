@@ -1,6 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+import uuid
+import os
+from django.utils.text import slugify
+
+
+def movie_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    return os.path.join("uploads", "movies", filename)
 
 
 class CinemaHall(models.Model):
@@ -41,6 +50,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
 
     class Meta:
         ordering = ["title"]
