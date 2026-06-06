@@ -56,4 +56,3 @@ class TokenSerializer(serializers.Serializer):
 
         return data
 
-
