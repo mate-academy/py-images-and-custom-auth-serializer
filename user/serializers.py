@@ -55,3 +55,5 @@ class TokenSerializer(serializers.Serializer):
             raise serializers.ValidationError(msg, code="authorization")
 
         return data
+
+
