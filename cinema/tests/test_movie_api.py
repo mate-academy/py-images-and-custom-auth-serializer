@@ -89,11 +89,16 @@ class MovieImageUploadTests(TestCase):
             img.save(ntf, format="JPEG")
             ntf.seek(0)
             res = self.client.post(url, {"image": ntf}, format="multipart")
+            # ... після self.client.post(url, {"image": ntf}, format="multipart")
+            if res.status_code != status.HTTP_200_OK:
+                print(f"DEBUG: Response data is {res.data}")
+                print(f"DEBUG: Serializer errors (if any) are {res.data}")
         self.movie.refresh_from_db()
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn("image", res.data)
         self.assertTrue(os.path.exists(self.movie.image.path))
+
 
     def test_upload_image_bad_request(self):
         """Test uploading an invalid image"""
