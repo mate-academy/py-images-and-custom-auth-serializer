@@ -1,11 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+from user.forms import CustomUserCreationForm
 from user.models import User
 
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
+    add_form = CustomUserCreationForm
+
     ordering = ("email",)
 
     list_display = (
@@ -15,11 +18,44 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
     )
 
-    fieldsets = UserAdmin.fieldsets + (
+    fieldsets = (
         (
-            "Custom fields",
+            None,
             {
-                "fields": (),
+                "fields": (
+                    "email",
+                    "password",
+                )
+            },
+        ),
+        (
+            "Personal info",
+            {
+                "fields": (
+                    "first_name",
+                    "last_name",
+                )
+            },
+        ),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+        (
+            "Important dates",
+            {
+                "fields": (
+                    "last_login",
+                    "date_joined",
+                )
             },
         ),
     )
