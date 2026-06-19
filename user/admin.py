@@ -7,10 +7,17 @@ from user.models import User
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     ordering = ("email",)
-    list_display = ("email", "is_staff", "is_active")
+    list_display = (
+        "email",
+        "is_staff",
+        "is_active",
+    )
 
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
+        (None, {"fields": (
+            "email",
+            "password",
+        )}),
         ("Permissions", {"fields": (
             "is_staff",
             "is_active",
@@ -18,7 +25,10 @@ class CustomUserAdmin(UserAdmin):
             "groups",
             "user_permissions"
         )}),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
+        ("Important dates", {"fields": (
+            "last_login",
+            "date_joined",
+        )}),
     )
 
     add_fieldsets = (
