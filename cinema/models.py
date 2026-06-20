@@ -1,6 +1,18 @@
+import os
+import uuid as uuid_lib
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
+from django.utils.text import slugify
+
+
+def movie_image_file_path(instance, filename):
+    _, ext = os.path.splitext(filename)
+    movie = instance
+    uuid = uuid_lib.uuid4()
+    filename = f"{slugify(movie.title)}-{uuid}{ext}"
+    return os.path.join("uploads", "movies", filename)
 
 
 class CinemaHall(models.Model):
@@ -41,6 +53,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
 
     class Meta:
         ordering = ["title"]
@@ -58,7 +71,8 @@ class MovieSession(models.Model):
         ordering = ["-show_time"]
 
     def __str__(self):
-        return self.movie.title + " " + str(self.show_time)
+        show_time = self.show_time.strftime("%Y-%m-%d %H:%M:%S")
+        return f"{self.movie.title} {show_time}"
 
 
 class Order(models.Model):
@@ -68,7 +82,7 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return str(self.created_at)
+        return self.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
     class Meta:
         ordering = ["-created_at"]
@@ -118,7 +132,10 @@ class Ticket(models.Model):
     ):
         self.full_clean()
         return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
         )
 
     def __str__(self):
