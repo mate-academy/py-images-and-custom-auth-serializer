@@ -1,7 +1,9 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -22,6 +24,7 @@ from cinema.serializers import (
     MovieListSerializer,
     OrderSerializer,
     OrderListSerializer,
+    MovieImageSerializer,
 )
 
 
@@ -73,11 +76,11 @@ class MovieViewSet(
         """Converts a list of string IDs to a list of integers"""
         return [int(str_id) for str_id in qs.split(",")]
 
-    def get_queryset(self):
+    def get_queryset(self): #type: ignore
         """Retrieve the movies with filters"""
-        title = self.request.query_params.get("title")
-        genres = self.request.query_params.get("genres")
-        actors = self.request.query_params.get("actors")
+        title = self.request.query_params.get("title") #type: ignore
+        genres = self.request.query_params.get("genres") #type: ignore
+        actors = self.request.query_params.get("actors") #type: ignore
 
         queryset = self.queryset
 
@@ -94,7 +97,7 @@ class MovieViewSet(
 
         return queryset.distinct()
 
-    def get_serializer_class(self):
+    def get_serializer_class(self): #type: ignore
         if self.action == "list":
             return MovieListSerializer
 
@@ -103,6 +106,22 @@ class MovieViewSet(
 
         return MovieSerializer
 
+
+@action(
+    method=["POST"],
+    detail = True,
+    url_path = "upload-image",
+    permissions_classes = [IsAdminOrIfAuthenticatedReadOnly],
+)
+def upload_image(self, request, pk=None):
+    movie = self.get_object()
+    serializer = self.get_serializer(movie, data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+  
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
@@ -119,9 +138,9 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def get_queryset(self):
-        date = self.request.query_params.get("date")
-        movie_id_str = self.request.query_params.get("movie")
+    def get_queryset(self): #type: ignore
+        date = self.request.query_params.get("date") #type: ignore
+        movie_id_str = self.request.query_params.get("movie") #type:ignore
 
         queryset = self.queryset
 
@@ -134,7 +153,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def get_serializer_class(self):
+    def get_serializer_class(self): #type: ignore
         if self.action == "list":
             return MovieSessionListSerializer
 
@@ -162,10 +181,9 @@ class OrderViewSet(
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+    def get_queryset(self): #type: ignore        return Order.objects.filter(user=self.request.user)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self): #type: ignore
         if self.action == "list":
             return OrderListSerializer
 
