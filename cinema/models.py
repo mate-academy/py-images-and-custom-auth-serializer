@@ -1,6 +1,18 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+
+import os
+import uuid as uuid_li
+
+
+def movie_image_file_path(instance, filename):
+    _, ext = os.path.splitext(filename)
+    movie = instance
+    uuid = uuid_li.uuid4()
+    filename = f"{slugify(movie.title)}-{uuid}{ext}"
+    return os.path.join("uploads", "movies", filename)
 
 
 class CinemaHall(models.Model):
@@ -41,6 +53,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(upload_to=movie_image_file_path)
 
     class Meta:
         ordering = ["title"]
@@ -58,8 +71,8 @@ class MovieSession(models.Model):
         ordering = ["-show_time"]
 
     def __str__(self):
-        return self.movie.title + " " + str(self.show_time)
-
+        show_time = self.show_time.strftime("%Y-%m-%d %H:%M")
+        return self.movie.title + " " + show_time
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
