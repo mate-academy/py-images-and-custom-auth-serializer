@@ -10,6 +10,10 @@ from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
 
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -22,6 +26,7 @@ from cinema.serializers import (
     MovieListSerializer,
     OrderSerializer,
     OrderListSerializer,
+    MovieImageSerializer,
 )
 
 
@@ -94,12 +99,35 @@ class MovieViewSet(
 
         return queryset.distinct()
 
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="upload-image",
+    )
+    def upload_image(self, request, pk=None):
+        movie = self.get_object()
+
+        serializer = self.get_serializer(
+            movie,
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
     def get_serializer_class(self):
         if self.action == "list":
             return MovieListSerializer
 
         if self.action == "retrieve":
             return MovieDetailSerializer
+
+        if self.action == "upload_image":
+            return MovieImageSerializer
 
         return MovieSerializer
 
