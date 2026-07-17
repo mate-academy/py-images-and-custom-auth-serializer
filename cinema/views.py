@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from http import HTTPMethod
-
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
@@ -120,7 +118,7 @@ class MovieViewSet(
 
     @action(
         detail=True,
-        methods=[HTTPMethod.POST],
+        methods=["post"],
         url_name="upload-image",
         url_path="upload-image",
         permission_classes=[IsAdminUser]
