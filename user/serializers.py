@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class AuthTokenSerializer(serializers.Serializer):
-    email = serializers.CharField(label=_("Email"), write_only=True)
+    email = serializers.EmailField(label=_("Email"), write_only=True)
     password = serializers.CharField(
         label=_("Password"),
         style={"input_type": "password"},
@@ -31,7 +31,7 @@ class AuthTokenSerializer(serializers.Serializer):
                 msg = _("Unable to log in with provided credentials.")
                 raise serializers.ValidationError(msg, code="authorization")
         else:
-            msg = _('Must include "username" and "password".')
+            msg = _('Must include "email" and "password".')
             raise serializers.ValidationError(msg, code="authorization")
 
         attrs["user"] = user
