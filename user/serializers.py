@@ -1,5 +1,30 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+        if email and password:
+            user = User.objects.filter(email=email).first()
+            if not user:
+                raise serializers.ValidationError("Invalid credentials")
+            if not user.check_password(password):
+                raise serializers.ValidationError("Invalid credentials")
+            if not user.is_active:
+                raise serializers.ValidationError("User is not active")
+            attrs["user"] = user
+        else:
+            raise serializers.ValidationError(
+                "Must include email and password"
+            )
+        return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -7,7 +32,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ("id", "email", "password", "is_staff")
         read_only_fields = ("is_staff",)
-        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
+        extra_kwargs = {
+            "password": {
+                "write_only": True,
+                "min_length": 5,
+                "style": {"input_type": "password"},
+                "label": "Password",
+            }
+        }
 
     def create(self, validated_data):
         """Create a new user with encrypted password and return it"""
