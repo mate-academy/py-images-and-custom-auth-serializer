@@ -15,8 +15,18 @@ router.register("genres", GenreViewSet)
 router.register("actors", ActorViewSet)
 router.register("cinema_halls", CinemaHallViewSet)
 router.register("movies", MovieViewSet)
-router.register("movie_sessions", MovieSessionViewSet)
-router.register("orders", OrderViewSet)
+router.register(
+    "movie_sessions",
+    MovieSessionViewSet,
+    basename="moviesession",
+)
+
+router.register(
+    "orders",
+    OrderViewSet,
+    basename="order",
+)
+
 
 urlpatterns = [path("", include(router.urls))]
 
