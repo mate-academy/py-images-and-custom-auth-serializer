@@ -1,6 +1,17 @@
+from uuid import uuid4
+
+from pathlib import Path
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+
+
+def create_custom_path(obj, filename):
+    extension = Path(filename).suffix
+
+    return Path("upload/movies") / f"{slugify(obj.title)}-{uuid4()}{extension}"
 
 
 class CinemaHall(models.Model):
@@ -41,6 +52,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=create_custom_path)
 
     class Meta:
         ordering = ["title"]
