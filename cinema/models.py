@@ -1,6 +1,9 @@
+import os
+from uuid import uuid4
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +38,18 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def custom_upload_to(instance, filename):
+    _, ext = os.path.splitext(filename)
+    return f"{slugify(instance.title)}-{uuid4()}{ext}"
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(upload_to=custom_upload_to, null=True)
 
     class Meta:
         ordering = ["title"]
