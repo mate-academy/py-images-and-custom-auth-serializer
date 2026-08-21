@@ -1,6 +1,19 @@
+import os
+import uuid
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
+from django.utils.text import slugify
+
+
+def movie_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    return os.path.join(
+        "uploads",
+        "movies",
+        f"{slugify(instance.title)}-{uuid.uuid4()}{extension}",
+    )
 
 
 class CinemaHall(models.Model):
@@ -28,7 +41,7 @@ class Actor(models.Model):
     last_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def full_name(self):
@@ -41,6 +54,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
 
     class Meta:
         ordering = ["title"]
@@ -58,7 +72,7 @@ class MovieSession(models.Model):
         ordering = ["-show_time"]
 
     def __str__(self):
-        return self.movie.title + " " + str(self.show_time)
+        return f"{self.movie.title} {self.show_time}"
 
 
 class Order(models.Model):
@@ -117,14 +131,11 @@ class Ticket(models.Model):
         update_fields=None,
     ):
         self.full_clean()
-        return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
-        )
+        return super().save(force_insert, force_update, using, update_fields)
 
     def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
+        return (f"{str(self.movie_session)}"
+                f"(row: {self.row}, seat: {self.seat})")
 
     class Meta:
         unique_together = ("movie_session", "row", "seat")
