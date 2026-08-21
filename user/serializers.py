@@ -1,4 +1,5 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 
@@ -22,3 +23,24 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(
+        style={"input_type": "password"},
+        trim_whitespace=False,
+    )
+
+    def validate(self, attrs):
+        user = authenticate(
+            request=self.context.get("request"),
+            email=attrs.get("email"),
+            password=attrs.get("password"),
+        )
+        if not user:
+            message = _("Unable to authenticate with provided credentials.")
+            raise serializers.ValidationError(message, code="authorization")
+
+        attrs["user"] = user
+        return attrs

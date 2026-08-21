@@ -1,0 +1,18 @@
+from django.db import migrations
+import user.models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('user', '0002_remove_user_username_alter_user_email'),
+    ]
+
+    operations = [
+        migrations.AlterModelManagers(
+            name='user',
+            managers=[
+                ('objects', user.models.UserManager()),
+            ],
+        ),
+    ]
