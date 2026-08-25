@@ -101,6 +101,8 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
+
+
         return MovieSerializer
 
 
