@@ -4,7 +4,7 @@ import uuid
 
 def movie_image_path(instance, movie_image: str) -> str:
     split = movie_image.split(".")
-    filename, ext = split[0], split[-1]
+    _, ext = split[0], split[-1]
     return os.path.join("cinema",
                         "movie",
                         f"slugify{instance.title}-{uuid.uuid4()}.{ext}")
