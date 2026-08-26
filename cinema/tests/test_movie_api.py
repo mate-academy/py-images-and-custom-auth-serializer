@@ -48,7 +48,7 @@ def sample_movie_session(**params):
     )
 
     defaults = {
-        "show_time": "2022-06-02 14:00:00",
+        "show_time": "2022-06-02T14:00:00Z",
         "movie": None,
         "cinema_hall": cinema_hall,
     }
@@ -94,6 +94,10 @@ class MovieImageUploadTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn("image", res.data)
         self.assertTrue(os.path.exists(self.movie.image.path))
+        self.assertRegex(
+            os.path.basename(self.movie.image.name),
+            r"^sample-movie-[0-9a-f-]{36}\.jpg$",
+        )
 
     def test_upload_image_bad_request(self):
         """Test uploading an invalid image"""
@@ -157,3 +161,9 @@ class MovieImageUploadTests(TestCase):
         res = self.client.get(MOVIE_SESSION_URL)
 
         self.assertIn("movie_image", res.data[0].keys())
+
+        detail_url = reverse(
+            "cinema:moviesession-detail", args=[self.movie_session.id]
+        )
+        detail_res = self.client.get(detail_url)
+        self.assertIn("image", detail_res.data["movie"])
