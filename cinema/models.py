@@ -41,8 +41,9 @@ class Actor(models.Model):
 
 
 def movie_image_path(instance: "Movie", filename: str) -> pathlib.Path:
-   filename = f"{slugify(instance.title)}-{uuid.uuid4()}" + pathlib.Path(filename).suffix
-   return pathlib.Path("upload/movies") / pathlib.Path(filename)
+    filename = (f"{slugify(instance.title)}"
+                f"-{uuid.uuid4()}") + pathlib.Path(filename).suffix
+    return pathlib.Path("upload/movies") / pathlib.Path(filename)
 
 
 class Movie(models.Model):
@@ -121,11 +122,11 @@ class Ticket(models.Model):
         )
 
     def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
     ):
         self.full_clean()
         return super(Ticket, self).save(
