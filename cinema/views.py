@@ -127,13 +127,6 @@ class MovieViewSet(
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class MovieUploadImageViewSet(mixins.UpdateModelMixin,
-#                        GenericViewSet):
-#     queryset = Movie.objects.all()
-#     serializer_class = MovieImageSerializer
-#     authentication_classes = (TokenAuthentication,)
-#     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
-
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
         MovieSession.objects.all()
