@@ -1,6 +1,10 @@
+import pathlib
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.template.defaultfilters import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +39,22 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def instance_image_name_path(instance, filename):
+    model_name = instance.__class__.__name__.lower()
+    filename = (
+        f"{slugify(instance.title)}-{uuid.uuid4()}"
+        f"{pathlib.Path(filename).suffix}"
+    )
+    return pathlib.Path(f"upload/{model_name}") / pathlib.Path(filename)
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=instance_image_name_path)
 
     class Meta:
         ordering = ["title"]
@@ -79,7 +93,9 @@ class Ticket(models.Model):
         MovieSession, on_delete=models.CASCADE, related_name="tickets"
     )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets"
+        Order,
+        on_delete=models.CASCADE,
+        related_name="tickets"
     )
     row = models.IntegerField()
     seat = models.IntegerField()
@@ -122,9 +138,8 @@ class Ticket(models.Model):
         )
 
     def __str__(self):
-        return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
-        )
+        return (f"{str(self.movie_session)} "
+                f"(row: {self.row}, seat: {self.seat})")
 
     class Meta:
         unique_together = ("movie_session", "row", "seat")
