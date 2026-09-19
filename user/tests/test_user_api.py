@@ -34,6 +34,7 @@ class PublicUserApiTests(TestCase):
         user = get_user_model().objects.get(**res.data)
         self.assertTrue(user.check_password(payload["password"]))
         self.assertNotIn("password", res.data)
+        self.assertNotIn("username", res.data)
 
     def test_user_exists(self):
         """Test creating a user that already exists fails"""
@@ -72,6 +73,32 @@ class PublicUserApiTests(TestCase):
         res = self.client.post(TOKEN_URL, payload)
         self.assertIn("token", res.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_create_token_with_username_instead_of_email(self):
+        create_user(email="test@test.com", password="test123")
+
+        res = self.client.post(
+            TOKEN_URL,
+            {"username": "test@test.com", "password": "test123"},
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("token", res.data)
+        self.assertIn("email", res.data)
+
+    def test_token_authenticates_profile_request(self):
+        user = create_user(email="test@test.com", password="test123")
+        login = self.client.post(
+            TOKEN_URL, {"email": user.email, "password": "test123"}
+        )
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {login.data['token']}"
+        )
+
+        res = self.client.get(ME_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["id"], user.id)
 
     def test_create_token_invalid_credentials(self):
         """Test that token is not created if invalid credentials are given"""
