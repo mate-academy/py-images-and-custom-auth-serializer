@@ -1,6 +1,10 @@
+import os
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +39,29 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def image_custom_path(instance, filename):
+    _, ext = os.path.splitext(filename)
+    return os.path.join(
+        "uploads/images/",
+        f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
+    )
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
-    genres = models.ManyToManyField(Genre)
-    actors = models.ManyToManyField(Actor)
+    genres = models.ManyToManyField(
+        Genre, related_name="movies"
+    )
+    actors = models.ManyToManyField(
+        Actor, related_name="movies"
+    )
+    image = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to=image_custom_path
+    )
 
     class Meta:
         ordering = ["title"]
@@ -118,7 +139,10 @@ class Ticket(models.Model):
     ):
         self.full_clean()
         return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
         )
 
     def __str__(self):
