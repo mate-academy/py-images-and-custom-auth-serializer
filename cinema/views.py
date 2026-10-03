@@ -1,10 +1,18 @@
+from __future__ import annotations
+
 from datetime import datetime
+
+from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.serializers import BaseSerializer
 
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
@@ -15,6 +23,7 @@ from cinema.serializers import (
     ActorSerializer,
     CinemaHallSerializer,
     MovieSerializer,
+    MovieImageSerializer,
     MovieSessionSerializer,
     MovieSessionListSerializer,
     MovieDetailSerializer,
@@ -94,7 +103,9 @@ class MovieViewSet(
 
         return queryset.distinct()
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[BaseSerializer]:
+        if self.action == "upload_image":
+            return MovieImageSerializer
         if self.action == "list":
             return MovieListSerializer
 
@@ -102,6 +113,24 @@ class MovieViewSet(
             return MovieDetailSerializer
 
         return MovieSerializer
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="upload-image",
+        permission_classes=[IsAdminUser],
+        parser_classes=[MultiPartParser, FormParser],
+    )
+    def upload_image(
+        self, request: Request, pk: str | None = None
+    ) -> Response:
+        """Validate and store a movie image for staff users only."""
+        serializer = self.get_serializer(
+            self.get_object(), data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):

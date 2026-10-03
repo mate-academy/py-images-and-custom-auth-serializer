@@ -1,4 +1,6 @@
-from django.urls import path, include
+"""Register cinema routes, including MovieViewSet's upload-image action."""
+
+from django.urls import include, path
 from rest_framework import routers
 
 from cinema.views import (

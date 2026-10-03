@@ -5,7 +5,7 @@ Read [the guideline](https://github.com/mate-academy/py-task-guideline/blob/main
 - Use the following command to load prepared data from fixture to test and debug your code:
   `python manage.py loaddata cinema_service_db_data.json`.
 - After loading data from fixture you can use following superuser (or create another one by yourself):
-  - Login: `admin.user`
+  - Login email: `admin.user@cinema.com`
   - Password: `1qazcde3`
 
 ### In this task you will work with images and add auth token serializer
