@@ -87,7 +87,7 @@ class PublicUserApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_token_no_user(self):
-        """Test that token is not created if user doesn't exist"""
+        """Test that token is not created if user doesn"t exist"""
         payload = {
             "email": "test@test.com",
             "password": "test123",
