@@ -1,6 +1,10 @@
+import os
+import uuid
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
+from django.utils.text import slugify
 
 
 class CinemaHall(models.Model):
@@ -35,12 +39,21 @@ class Actor(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+def movie_image_upload(instance, filename):
+    _, extension = os.path.splitext(filename)
+    return os.path.join(
+        "uploads/images/",
+        f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    )
+
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(null=True, upload_to=movie_image_upload)
 
     class Meta:
         ordering = ["title"]
@@ -117,13 +130,13 @@ class Ticket(models.Model):
         update_fields=None,
     ):
         self.full_clean()
-        return super(Ticket, self).save(
+        return super().save(
             force_insert, force_update, using, update_fields
         )
 
     def __str__(self):
         return (
-            f"{str(self.movie_session)} (row: {self.row}, seat: {self.seat})"
+            f"{self.movie_session!s} (row: {self.row}, seat: {self.seat})"
         )
 
     class Meta:
