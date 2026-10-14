@@ -41,8 +41,8 @@ class Actor(models.Model):
 
 def movie_image_path(instance: "Movie", filename: str) -> pathlib.Path:
     filename = (
-            f"{slugify(instance.title)}-{uuid.uuid4()}"
-            + pathlib.Path(filename).suffix
+        f"{slugify(instance.title)}-{uuid.uuid4()}"
+        + pathlib.Path(filename).suffix
     )
     return pathlib.Path("upload/movies/") / pathlib.Path(filename)
 
@@ -108,9 +108,9 @@ class Ticket(models.Model):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                                          f"number must be in available range: "
-                                          f"(1, {cinema_hall_attr_name}): "
-                                          f"(1, {count_attrs})"
+                        f"number must be in available range: "
+                        f"(1, {cinema_hall_attr_name}): "
+                        f"(1, {count_attrs})"
                     }
                 )
 
