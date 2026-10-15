@@ -9,6 +9,4 @@ venv/
 *.pyc
 **db.sqlite3
 .venv
-user/migrations
-cinema/migrations
 media/
