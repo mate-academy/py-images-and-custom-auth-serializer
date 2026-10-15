@@ -79,6 +79,7 @@ class MovieImageUploadTests(TestCase):
         self.movie_session = sample_movie_session(movie=self.movie)
 
     def tearDown(self):
+        self.movie.refresh_from_db()
         self.movie.image.delete()
 
     def test_upload_image_to_movie(self):
@@ -147,7 +148,7 @@ class MovieImageUploadTests(TestCase):
 
         self.assertIn("image", res.data[0].keys())
 
-    def test_image_url_is_shown_on_movie_session_detail(self):
+    def test_image_url_is_shown_on_movie_session_list(self):
         url = image_upload_url(self.movie.id)
         with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
             img = Image.new("RGB", (10, 10))
@@ -157,3 +158,14 @@ class MovieImageUploadTests(TestCase):
         res = self.client.get(MOVIE_SESSION_URL)
 
         self.assertIn("movie_image", res.data[0].keys())
+        self.movie.refresh_from_db()
+        expected_url = "http://testserver" + self.movie.image.url
+        self.assertEqual(res.data[0]["movie_image"], expected_url)
+
+        detail = self.client.get(
+            reverse(
+                "cinema:moviesession-detail", args=[self.movie_session.id]
+            )
+        )
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail.data["movie"]["image"], expected_url)
