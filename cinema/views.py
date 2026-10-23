@@ -110,10 +110,10 @@ class MovieViewSet(
         return MovieSerializer
 
     @action(
-            methods=["POST"],
-            detail=True,
-            permission_classes=[IsAdminUser],
-            url_path="upload-image"
+        methods=["POST"],
+        detail=True,
+        permission_classes=[IsAdminUser],
+        url_path="upload-image"
     )
     def upload_image(self, request, pk=None):
         bus = self.get_object()
