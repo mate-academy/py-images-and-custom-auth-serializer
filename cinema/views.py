@@ -113,7 +113,7 @@ class MovieViewSet(
         methods=["POST"],
         detail=True,
         permission_classes=[IsAdminUser],
-        url_path="upload-image"
+        url_path="upload_image"
     )
     def upload_image(self, request, pk=None):
         bus = self.get_object()
