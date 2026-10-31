@@ -5,13 +5,15 @@ from django.conf.urls.static import static
 
 from rest_framework.authtoken.views import obtain_auth_token
 
+from user.views import CreateTokenView
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/cinema/", include("cinema.urls", namespace="cinema")),
     path("api/user/", include("user.urls", namespace="user")),
     path("__debug__/", include("debug_toolbar.urls")),
-    path('api/token/', obtain_auth_token, name='api_token_auth'),
+    path("api/token/", CreateTokenView.as_view(), name="api_token_auth"),
 ]
 
 if settings.DEBUG:
