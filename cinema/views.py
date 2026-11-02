@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.core.serializers import serialize, get_serializer
 from rest_framework.decorators import action
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins, status
@@ -104,7 +103,7 @@ class MovieViewSet(
         if self.action == "retrieve":
             return MovieDetailSerializer
 
-        if self.action == "uploads_image":
+        if self.action == "upload_image":
             return MovieImageSerializer
 
         return MovieSerializer
@@ -112,9 +111,9 @@ class MovieViewSet(
     @action(
         methods=["POST"],
         detail=True,
-        url_path="uploads-image"
+        url_path="upload-image"
     )
-    def uploads_image(self, request, pk=None):
+    def upload_image(self, request, pk=None):
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
 

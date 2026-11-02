@@ -59,7 +59,7 @@ def sample_movie_session(**params):
 
 def image_upload_url(movie_id):
     """Return URL for recipe image uploads"""
-    return reverse("cinema:movie-uploads-image", args=[movie_id])
+    return reverse("cinema:movie-upload-image", args=[movie_id])
 
 
 def detail_url(movie_id):
