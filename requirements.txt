@@ -6,3 +6,8 @@ pep8-naming==0.13.2
 django-debug-toolbar==3.2.4
 djangorestframework==3.13.1
 Pillow
+flake8-quotes
+flake8-variables-names
+pep8-naming
+django-debug-toolbar
+djangorestframework
