@@ -43,18 +43,18 @@ class AuthTokenSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        username = attrs.get("email")
+        email = attrs.get("email")
         password = attrs.get("password")
 
-        if username and password:
+        if email and password:
             user = authenticate(request=self.context.get("request"),
-                                username=username, password=password)
+                                email=email, password=password)
 
             if not user:
                 msg = _("Unable to log in with provided credentials.")
                 raise serializers.ValidationError(msg, code="authorization")
         else:
-            msg = _("Must include 'username' and 'password'.")
+            msg = _("Must include 'email' and 'password'.")
             raise serializers.ValidationError(msg, code="authorization")
 
         attrs["user"] = user
