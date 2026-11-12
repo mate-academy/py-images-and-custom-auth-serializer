@@ -42,6 +42,9 @@ class MovieSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         if obj.image:
+            request = self.context.get("request")
+            if request:
+                return request.build_absolute_uri(obj.image.url)
             return obj.image.url
         return None
 
@@ -104,6 +107,9 @@ class MovieSessionListSerializer(MovieSessionSerializer):
 
     def get_movie_image(self, obj):
         if obj.movie.image:
+            request = self.context.get("request")
+            if request:
+                return request.build_absolute_uri(obj.movie.image.url)
             return obj.movie.image.url
         return None
 

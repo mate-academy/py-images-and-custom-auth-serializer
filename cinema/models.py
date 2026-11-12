@@ -7,6 +7,12 @@ from django.conf import settings
 from django.utils.text import slugify
 
 
+def movie_image_upload_to(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    new_name = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
+    return os.path.join("uploads/movies/", new_name)
+
+
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
@@ -45,22 +51,13 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
-    image = models.ImageField(upload_to="uploads/movies/", blank=True)
+    image = models.ImageField(upload_to=movie_image_upload_to, blank=True)
 
     class Meta:
         ordering = ["title"]
 
     def __str__(self):
         return self.title
-
-    def save(self, *args, **kwargs):
-        if self.image and not self.id:
-            img = self.image
-            ext = os.path.splitext(img.name)[1]
-            new_name = f"{slugify(self.title)}-{uuid.uuid4()}{ext}"
-            relative_path = os.path.join("uploads/movies/", new_name)
-            self.image.name = relative_path
-        super().save(*args, **kwargs)
 
 
 class MovieSession(models.Model):
