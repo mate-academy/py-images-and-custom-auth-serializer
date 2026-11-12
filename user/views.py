@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 
-from user.serializers import UserSerializer
+from user.serializers import UserSerializer, AuthTokenSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -12,6 +12,7 @@ class CreateUserView(generics.CreateAPIView):
 
 
 class CreateTokenView(ObtainAuthToken):
+    serializer_class = AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
@@ -19,6 +20,11 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    http_method_names = ("get", "patch", "put")
 
     def get_object(self):
         return self.request.user
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs["partial"] = self.request.method in ("PATCH",)
+        return super().get_serializer(*args, **kwargs)

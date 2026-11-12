@@ -1,10 +1,11 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
@@ -15,6 +16,7 @@ from cinema.serializers import (
     ActorSerializer,
     CinemaHallSerializer,
     MovieSerializer,
+    MovieImageSerializer,
     MovieSessionSerializer,
     MovieSessionListSerializer,
     MovieDetailSerializer,
@@ -173,3 +175,21 @@ class OrderViewSet(
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class MovieImageUploadViewSet(mixins.CreateModelMixin, GenericViewSet):
+    queryset = Movie.objects.all()
+    serializer_class = MovieImageSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def create(self, request, *args, **kwargs):
+        instance = self.get_object()
+        image_serializer = MovieImageSerializer(
+            instance,
+            data={"image": request.FILES.get("image")},
+            partial=True,
+        )
+        image_serializer.is_valid(raise_exception=True)
+        image_serializer.save()
+        return Response(image_serializer.data, status=status.HTTP_200_OK)
