@@ -1,10 +1,12 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
@@ -21,7 +23,7 @@ from cinema.serializers import (
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
-    OrderListSerializer,
+    OrderListSerializer, MovieImageSerializer,
 )
 
 
@@ -72,6 +74,19 @@ class MovieViewSet(
     def _params_to_ints(qs):
         """Converts a list of string IDs to a list of integers"""
         return [int(str_id) for str_id in qs.split(",")]
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+    )
+    def upload_image(self, request, pk=None):
+        movie = self.get_object()
+        serializer = MovieImageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        movie.image = serializer.validated_data["image"]
+        movie.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         """Retrieve the movies with filters"""
