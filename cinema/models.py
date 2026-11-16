@@ -14,6 +14,7 @@ def movie_image_path_maker(movie, filename):
 
     return f"{movie_title_slug}-{unique_id}{extension}"
 
+
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
